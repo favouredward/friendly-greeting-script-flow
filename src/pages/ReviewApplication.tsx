@@ -3,11 +3,15 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Navigation from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 const ReviewApplication = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [personalInfo, setPersonalInfo] = useState<any>(null);
   const [employmentInfo, setEmploymentInfo] = useState<any>(null);
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     const personalData = localStorage.getItem('personalInfo');
@@ -22,16 +26,73 @@ const ReviewApplication = () => {
     setEmploymentInfo(JSON.parse(employmentData));
   }, [navigate]);
 
-  const handleSubmit = () => {
-    // In a real app, this would submit to an API
-    const applicationData = {
-      ...personalInfo,
-      ...employmentInfo,
-      submittedAt: new Date().toISOString()
-    };
+  const handleSubmit = async () => {
+    if (!personalInfo || !employmentInfo) return;
     
-    localStorage.setItem('submittedApplication', JSON.stringify(applicationData));
-    navigate('/apply/success');
+    setSubmitting(true);
+    
+    try {
+      // Prepare the application data for Supabase
+      const applicationData = {
+        full_name: personalInfo.fullName,
+        email: personalInfo.email,
+        phone_number: personalInfo.phoneNumber,
+        date_of_birth: personalInfo.dateOfBirth,
+        country: personalInfo.country,
+        address: personalInfo.address,
+        program: personalInfo.program,
+        employment_status: employmentInfo.employmentStatus,
+        years_of_experience: parseInt(employmentInfo.yearsOfExperience) || 0,
+        current_employer: employmentInfo.currentEmployer || null,
+        salary: employmentInfo.salary || null,
+        status: 'submitted'
+      };
+
+      console.log('Submitting application:', applicationData);
+
+      const { data, error } = await supabase
+        .from('applications')
+        .insert(applicationData)
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Supabase error:', error);
+        throw error;
+      }
+
+      console.log('Application submitted successfully:', data);
+
+      // Store the submitted application data for the success page
+      const completeApplicationData = {
+        ...personalInfo,
+        ...employmentInfo,
+        submittedAt: new Date().toISOString(),
+        applicationId: data.id
+      };
+      
+      localStorage.setItem('submittedApplication', JSON.stringify(completeApplicationData));
+      
+      // Clear form data
+      localStorage.removeItem('personalInfo');
+      localStorage.removeItem('employmentInfo');
+      
+      toast({
+        title: "Success!",
+        description: "Your application has been submitted successfully.",
+      });
+
+      navigate('/apply/success');
+    } catch (error: any) {
+      console.error('Error submitting application:', error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to submit application. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const handleBack = () => {
@@ -124,14 +185,16 @@ const ReviewApplication = () => {
               onClick={handleBack}
               variant="outline"
               className="flex-1"
+              disabled={submitting}
             >
               Back
             </Button>
             <Button 
               onClick={handleSubmit}
+              disabled={submitting}
               className="flex-1 bg-green-600 hover:bg-green-700 text-white"
             >
-              Confirm & Submit
+              {submitting ? "Submitting..." : "Confirm & Submit"}
             </Button>
           </div>
         </div>

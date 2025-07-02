@@ -9,7 +9,105 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      applications: {
+        Row: {
+          address: string
+          country: string
+          created_at: string | null
+          current_employer: string | null
+          date_of_birth: string
+          email: string
+          employment_status: string
+          full_name: string
+          id: string
+          notes: string | null
+          phone_number: string
+          program: string
+          salary: string | null
+          status: string | null
+          updated_at: string | null
+          years_of_experience: number
+        }
+        Insert: {
+          address: string
+          country: string
+          created_at?: string | null
+          current_employer?: string | null
+          date_of_birth: string
+          email: string
+          employment_status: string
+          full_name: string
+          id?: string
+          notes?: string | null
+          phone_number: string
+          program: string
+          salary?: string | null
+          status?: string | null
+          updated_at?: string | null
+          years_of_experience?: number
+        }
+        Update: {
+          address?: string
+          country?: string
+          created_at?: string | null
+          current_employer?: string | null
+          date_of_birth?: string
+          email?: string
+          employment_status?: string
+          full_name?: string
+          id?: string
+          notes?: string | null
+          phone_number?: string
+          program?: string
+          salary?: string | null
+          status?: string | null
+          updated_at?: string | null
+          years_of_experience?: number
+        }
+        Relationships: []
+      }
+      countries: {
+        Row: {
+          code: string
+          id: number
+          name: string
+        }
+        Insert: {
+          code: string
+          id?: number
+          name: string
+        }
+        Update: {
+          code?: string
+          id?: number
+          name?: string
+        }
+        Relationships: []
+      }
+      programs: {
+        Row: {
+          description: string | null
+          duration_months: number | null
+          id: number
+          is_active: boolean | null
+          name: string
+        }
+        Insert: {
+          description?: string | null
+          duration_months?: number | null
+          id?: number
+          is_active?: boolean | null
+          name: string
+        }
+        Update: {
+          description?: string | null
+          duration_months?: number | null
+          id?: number
+          is_active?: boolean | null
+          name?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

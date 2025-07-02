@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Navigation from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
@@ -12,9 +12,12 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 const PersonalInfo = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -24,16 +27,32 @@ const PersonalInfo = () => {
     address: '',
     program: ''
   });
+  const [countries, setCountries] = useState<Array<{id: number, name: string, code: string}>>([]);
+  const [programs, setPrograms] = useState<Array<{id: number, name: string, description: string}>>([]);
+  const [loading, setLoading] = useState(false);
 
-  const countries = [
-    "Germany", "United States", "United Kingdom", "Canada", "Australia", 
-    "Nigeria", "South Africa", "Ghana", "Kenya", "France", "Spain"
-  ];
+  useEffect(() => {
+    fetchCountriesAndPrograms();
+  }, []);
 
-  const programs = [
-    "Cloud Computing", "Data Science", "Web Development", "Mobile App Development",
-    "Cybersecurity", "AI & Machine Learning", "Software Engineering", "DevOps"
-  ];
+  const fetchCountriesAndPrograms = async () => {
+    try {
+      const [countriesResponse, programsResponse] = await Promise.all([
+        supabase.from('countries').select('*').order('name'),
+        supabase.from('programs').select('*').eq('is_active', true).order('name')
+      ]);
+
+      if (countriesResponse.data) setCountries(countriesResponse.data);
+      if (programsResponse.data) setPrograms(programsResponse.data);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load form data. Please refresh the page.",
+        variant: "destructive"
+      });
+    }
+  };
 
   const handleInputChange = (field: string, value: string | Date | null) => {
     setFormData(prev => ({
@@ -43,7 +62,7 @@ const PersonalInfo = () => {
   };
 
   const handleNext = () => {
-    // Store form data in localStorage for now
+    // Store form data in localStorage for now (we'll use this in the employment step)
     localStorage.setItem('personalInfo', JSON.stringify(formData));
     navigate('/apply/employment');
   };
@@ -65,7 +84,7 @@ const PersonalInfo = () => {
         <div className="bg-white rounded-lg shadow-sm border p-8">
           <div className="space-y-6">
             <div>
-              <Label htmlFor="fullName">FullName</Label>
+              <Label htmlFor="fullName">Full Name</Label>
               <Input
                 id="fullName"
                 type="text"
@@ -87,7 +106,7 @@ const PersonalInfo = () => {
             </div>
 
             <div>
-              <Label htmlFor="phoneNumber">PhoneNumber</Label>
+              <Label htmlFor="phoneNumber">Phone Number</Label>
               <Input
                 id="phoneNumber"
                 type="tel"
@@ -98,7 +117,7 @@ const PersonalInfo = () => {
             </div>
 
             <div>
-              <Label>DateOfBirth</Label>
+              <Label>Date of Birth</Label>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
@@ -109,7 +128,7 @@ const PersonalInfo = () => {
                     )}
                   >
                     <CalendarIcon className="mr-2 h-4 w-4" />
-                    {formData.dateOfBirth ? format(formData.dateOfBirth, "MM/dd/yyyy") : "07/01/2025"}
+                    {formData.dateOfBirth ? format(formData.dateOfBirth, "MM/dd/yyyy") : "Select date"}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="start">
@@ -132,8 +151,8 @@ const PersonalInfo = () => {
                 </SelectTrigger>
                 <SelectContent>
                   {countries.map((country) => (
-                    <SelectItem key={country} value={country}>
-                      {country}
+                    <SelectItem key={country.id} value={country.name}>
+                      {country.name}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -159,8 +178,8 @@ const PersonalInfo = () => {
                 </SelectTrigger>
                 <SelectContent>
                   {programs.map((program) => (
-                    <SelectItem key={program} value={program}>
-                      {program}
+                    <SelectItem key={program.id} value={program.name}>
+                      {program.name}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -171,10 +190,10 @@ const PersonalInfo = () => {
           <div className="mt-8">
             <Button 
               onClick={handleNext}
-              disabled={!isFormValid()}
+              disabled={!isFormValid() || loading}
               className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3"
             >
-              Next: Employment Info
+              {loading ? "Loading..." : "Next: Employment Info"}
             </Button>
           </div>
         </div>
