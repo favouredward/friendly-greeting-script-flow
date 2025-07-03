@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Navigation from "@/components/Navigation";
@@ -12,6 +11,7 @@ const ReviewApplication = () => {
   const [personalInfo, setPersonalInfo] = useState<any>(null);
   const [employmentInfo, setEmploymentInfo] = useState<any>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [validationErrors, setValidationErrors] = useState<{[key: string]: string}>({});
 
   useEffect(() => {
     const personalData = localStorage.getItem('personalInfo');
@@ -26,8 +26,38 @@ const ReviewApplication = () => {
     setEmploymentInfo(JSON.parse(employmentData));
   }, [navigate]);
 
+  const validateInputs = () => {
+    const errors: {[key: string]: string} = {};
+    
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(personalInfo.email)) {
+      errors.email = "Please enter a valid email address";
+    }
+    
+    // Phone validation (basic check for numbers and common formats)
+    const phoneRegex = /^[\+]?[1-9][\d]{3,14}$/;
+    const cleanPhone = personalInfo.phoneNumber.replace(/[\s\-\(\)]/g, '');
+    if (!phoneRegex.test(cleanPhone)) {
+      errors.phone = "Please enter a valid phone number";
+    }
+    
+    setValidationErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
   const handleSubmit = async () => {
     if (!personalInfo || !employmentInfo) return;
+    
+    // Validate inputs before submitting
+    if (!validateInputs()) {
+      toast({
+        title: "Validation Error",
+        description: "Please check your email and phone number format.",
+        variant: "destructive"
+      });
+      return;
+    }
     
     setSubmitting(true);
     
@@ -63,6 +93,31 @@ const ReviewApplication = () => {
 
       console.log('Application submitted successfully:', data);
 
+      // Send email notification
+      try {
+        const { error: emailError } = await supabase.functions.invoke('send-application-notification', {
+          body: {
+            applicationData: {
+              id: data.id,
+              full_name: data.full_name,
+              email: data.email,
+              program: data.program,
+              created_at: data.created_at
+            }
+          }
+        });
+
+        if (emailError) {
+          console.error('Email sending error:', emailError);
+          // Don't fail the whole process if email fails
+        } else {
+          console.log('Email notification sent successfully');
+        }
+      } catch (emailError) {
+        console.error('Email notification failed:', emailError);
+        // Continue with success flow even if email fails
+      }
+
       // Store the submitted application data for the success page
       const completeApplicationData = {
         ...personalInfo,
@@ -79,7 +134,7 @@ const ReviewApplication = () => {
       
       toast({
         title: "Success!",
-        description: "Your application has been submitted successfully.",
+        description: "Your application has been submitted successfully. Check your email for confirmation.",
       });
 
       navigate('/apply/success');
@@ -128,11 +183,17 @@ const ReviewApplication = () => {
             <div className="border-b pb-2">
               <span className="font-semibold text-gray-900">Email:</span>
               <span className="ml-2 text-gray-700">{personalInfo.email}</span>
+              {validationErrors.email && (
+                <p className="text-red-500 text-sm mt-1">{validationErrors.email}</p>
+              )}
             </div>
             
             <div className="border-b pb-2">
               <span className="font-semibold text-gray-900">Phone Number:</span>
               <span className="ml-2 text-gray-700">{personalInfo.phoneNumber}</span>
+              {validationErrors.phone && (
+                <p className="text-red-500 text-sm mt-1">{validationErrors.phone}</p>
+              )}
             </div>
             
             <div className="border-b pb-2">
@@ -192,7 +253,7 @@ const ReviewApplication = () => {
             <Button 
               onClick={handleSubmit}
               disabled={submitting}
-              className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+              className="flex-1 bg-purple-600 hover:bg-purple-700 text-white shadow-lg hover:shadow-purple-500/25 transition-all duration-300"
             >
               {submitting ? "Submitting..." : "Confirm & Submit"}
             </Button>

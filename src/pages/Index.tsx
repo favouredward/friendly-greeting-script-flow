@@ -11,11 +11,13 @@ const Index = () => {
       <Navigation />
       
       {/* Hero Section */}
-      <div className="bg-white py-16">
+      <div className="bg-gradient-to-br from-purple-50 to-purple-100 py-16">
         <div className="max-w-4xl mx-auto text-center px-6">
           <div className="flex items-center justify-center mb-6">
-            <GraduationCap className="w-12 h-12 text-gray-700 mr-4" />
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-900">
+            <div className="bg-purple-100 p-3 rounded-full mr-4 animate-pulse">
+              <GraduationCap className="w-12 h-12 text-purple-600" />
+            </div>
+            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 bg-gradient-to-r from-purple-600 to-purple-800 bg-clip-text text-transparent">
               Apply now for a BlacTech Scholarship
             </h1>
           </div>
@@ -23,7 +25,7 @@ const Index = () => {
             Fill out your application easily! Fast approval & secure a spot.
           </p>
           <Link to="/apply/personal">
-            <Button className="bg-yellow-500 hover:bg-yellow-600 text-black px-8 py-4 text-lg font-semibold rounded-lg">
+            <Button className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white px-8 py-4 text-lg font-semibold rounded-lg shadow-lg hover:shadow-purple-500/50 transform hover:scale-105 transition-all duration-300 animate-pulse hover:animate-none">
               <Rocket className="w-5 h-5 mr-2" />
               Apply Now
             </Button>
@@ -36,7 +38,9 @@ const Index = () => {
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-12">
             <div className="flex items-center justify-center mb-4">
-              <Clipboard className="w-8 h-8 text-gray-700 mr-3" />
+              <div className="bg-purple-100 p-2 rounded-full mr-3">
+                <Clipboard className="w-8 h-8 text-purple-600" />
+              </div>
               <h2 className="text-3xl font-bold text-gray-900">How It Works</h2>
             </div>
           </div>
@@ -46,7 +50,7 @@ const Index = () => {
               number="1"
               title="Apply"
               description="Complete your application with valid details in just a few minutes."
-              borderColor="border-blue-500"
+              borderColor="border-purple-500"
             />
             <ProcessCard
               number="2"
