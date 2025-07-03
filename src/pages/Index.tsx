@@ -14,7 +14,7 @@ const Index = () => {
       <div className="bg-gradient-to-br from-purple-50 to-purple-100 py-16">
         <div className="max-w-4xl mx-auto text-center px-6">
           <div className="flex items-center justify-center mb-6">
-            <div className="bg-purple-100 p-3 rounded-full mr-4 animate-pulse">
+            <div className="bg-purple-100 p-3 rounded-full mr-4">
               <GraduationCap className="w-12 h-12 text-purple-600" />
             </div>
             <h1 className="text-4xl md:text-5xl font-bold text-gray-900 bg-gradient-to-r from-purple-600 to-purple-800 bg-clip-text text-transparent">
@@ -25,8 +25,8 @@ const Index = () => {
             Fill out your application easily! Fast approval & secure a spot.
           </p>
           <Link to="/apply/personal">
-            <Button className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white px-8 py-4 text-lg font-semibold rounded-lg shadow-lg hover:shadow-purple-500/50 transform hover:scale-105 transition-all duration-300 animate-pulse hover:animate-none">
-              <Rocket className="w-5 h-5 mr-2" />
+            <Button className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white px-12 py-6 text-xl font-semibold rounded-lg shadow-lg hover:shadow-purple-500/50 transform hover:scale-110 transition-all duration-300">
+              <Rocket className="w-6 h-6 mr-3" />
               Apply Now
             </Button>
           </Link>

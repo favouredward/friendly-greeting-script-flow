@@ -30,6 +30,7 @@ const PersonalInfo = () => {
   const [countries, setCountries] = useState<Array<{id: number, name: string, code: string}>>([]);
   const [programs, setPrograms] = useState<Array<{id: number, name: string, description: string}>>([]);
   const [loading, setLoading] = useState(false);
+  const [validationErrors, setValidationErrors] = useState<{[key: string]: string}>({});
 
   useEffect(() => {
     fetchCountriesAndPrograms();
@@ -54,14 +55,66 @@ const PersonalInfo = () => {
     }
   };
 
+  const validateEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  const validatePhone = (phone: string) => {
+    const phoneRegex = /^[\+]?[1-9][\d]{3,14}$/;
+    const cleanPhone = phone.replace(/[\s\-\(\)]/g, '');
+    return phoneRegex.test(cleanPhone);
+  };
+
   const handleInputChange = (field: string, value: string | Date | null) => {
     setFormData(prev => ({
       ...prev,
       [field]: value
     }));
+
+    // Clear validation error when user starts typing
+    if (validationErrors[field]) {
+      setValidationErrors(prev => ({
+        ...prev,
+        [field]: ''
+      }));
+    }
   };
 
   const handleNext = () => {
+    const errors: {[key: string]: string} = {};
+    
+    // Validate email
+    if (!formData.email) {
+      errors.email = "Email is required";
+    } else if (!validateEmail(formData.email)) {
+      errors.email = "Please enter a valid email address";
+    }
+    
+    // Validate phone number
+    if (!formData.phoneNumber) {
+      errors.phoneNumber = "Phone number is required";
+    } else if (!validatePhone(formData.phoneNumber)) {
+      errors.phoneNumber = "Please enter a valid phone number";
+    }
+    
+    // Check other required fields
+    if (!formData.fullName) errors.fullName = "Full name is required";
+    if (!formData.dateOfBirth) errors.dateOfBirth = "Date of birth is required";
+    if (!formData.country) errors.country = "Country is required";
+    if (!formData.address) errors.address = "Address is required";
+    if (!formData.program) errors.program = "Program is required";
+    
+    if (Object.keys(errors).length > 0) {
+      setValidationErrors(errors);
+      toast({
+        title: "Validation Error",
+        description: "Please fix the errors in the form before proceeding.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     // Store form data in localStorage for now (we'll use this in the employment step)
     localStorage.setItem('personalInfo', JSON.stringify(formData));
     navigate('/apply/employment');
@@ -69,7 +122,8 @@ const PersonalInfo = () => {
 
   const isFormValid = () => {
     return formData.fullName && formData.email && formData.phoneNumber && 
-           formData.dateOfBirth && formData.country && formData.address && formData.program;
+           formData.dateOfBirth && formData.country && formData.address && formData.program &&
+           validateEmail(formData.email) && validatePhone(formData.phoneNumber);
   };
 
   return (
@@ -90,8 +144,11 @@ const PersonalInfo = () => {
                 type="text"
                 value={formData.fullName}
                 onChange={(e) => handleInputChange('fullName', e.target.value)}
-                className="mt-1"
+                className={cn("mt-1", validationErrors.fullName && "border-red-500")}
               />
+              {validationErrors.fullName && (
+                <p className="text-red-500 text-sm mt-1">{validationErrors.fullName}</p>
+              )}
             </div>
 
             <div>
@@ -101,8 +158,11 @@ const PersonalInfo = () => {
                 type="email"
                 value={formData.email}
                 onChange={(e) => handleInputChange('email', e.target.value)}
-                className="mt-1"
+                className={cn("mt-1", validationErrors.email && "border-red-500")}
               />
+              {validationErrors.email && (
+                <p className="text-red-500 text-sm mt-1">{validationErrors.email}</p>
+              )}
             </div>
 
             <div>
@@ -112,8 +172,11 @@ const PersonalInfo = () => {
                 type="tel"
                 value={formData.phoneNumber}
                 onChange={(e) => handleInputChange('phoneNumber', e.target.value)}
-                className="mt-1"
+                className={cn("mt-1", validationErrors.phoneNumber && "border-red-500")}
               />
+              {validationErrors.phoneNumber && (
+                <p className="text-red-500 text-sm mt-1">{validationErrors.phoneNumber}</p>
+              )}
             </div>
 
             <div>
@@ -124,7 +187,8 @@ const PersonalInfo = () => {
                     variant="outline"
                     className={cn(
                       "w-full justify-start text-left font-normal mt-1",
-                      !formData.dateOfBirth && "text-muted-foreground"
+                      !formData.dateOfBirth && "text-muted-foreground",
+                      validationErrors.dateOfBirth && "border-red-500"
                     )}
                   >
                     <CalendarIcon className="mr-2 h-4 w-4" />
@@ -141,12 +205,15 @@ const PersonalInfo = () => {
                   />
                 </PopoverContent>
               </Popover>
+              {validationErrors.dateOfBirth && (
+                <p className="text-red-500 text-sm mt-1">{validationErrors.dateOfBirth}</p>
+              )}
             </div>
 
             <div>
               <Label>Country</Label>
               <Select value={formData.country} onValueChange={(value) => handleInputChange('country', value)}>
-                <SelectTrigger className="mt-1">
+                <SelectTrigger className={cn("mt-1", validationErrors.country && "border-red-500")}>
                   <SelectValue placeholder="-- Select Country --" />
                 </SelectTrigger>
                 <SelectContent>
@@ -157,6 +224,9 @@ const PersonalInfo = () => {
                   ))}
                 </SelectContent>
               </Select>
+              {validationErrors.country && (
+                <p className="text-red-500 text-sm mt-1">{validationErrors.country}</p>
+              )}
             </div>
 
             <div>
@@ -165,15 +235,18 @@ const PersonalInfo = () => {
                 id="address"
                 value={formData.address}
                 onChange={(e) => handleInputChange('address', e.target.value)}
-                className="mt-1"
+                className={cn("mt-1", validationErrors.address && "border-red-500")}
                 rows={3}
               />
+              {validationErrors.address && (
+                <p className="text-red-500 text-sm mt-1">{validationErrors.address}</p>
+              )}
             </div>
 
             <div>
               <Label>Program</Label>
               <Select value={formData.program} onValueChange={(value) => handleInputChange('program', value)}>
-                <SelectTrigger className="mt-1">
+                <SelectTrigger className={cn("mt-1", validationErrors.program && "border-red-500")}>
                   <SelectValue placeholder="-- Select Program --" />
                 </SelectTrigger>
                 <SelectContent>
@@ -184,14 +257,17 @@ const PersonalInfo = () => {
                   ))}
                 </SelectContent>
               </Select>
+              {validationErrors.program && (
+                <p className="text-red-500 text-sm mt-1">{validationErrors.program}</p>
+              )}
             </div>
           </div>
 
           <div className="mt-8">
             <Button 
               onClick={handleNext}
-              disabled={!isFormValid() || loading}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3"
+              disabled={loading}
+              className="w-full bg-purple-600 hover:bg-purple-700 text-white py-3 shadow-lg hover:shadow-purple-500/25 transition-all duration-300"
             >
               {loading ? "Loading..." : "Next: Employment Info"}
             </Button>

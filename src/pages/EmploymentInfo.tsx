@@ -123,7 +123,7 @@ const EmploymentInfo = () => {
             <Button 
               onClick={handleNext}
               disabled={!isFormValid()}
-              className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
+              className="flex-1 bg-purple-600 hover:bg-purple-700 text-white shadow-lg hover:shadow-purple-500/25 transition-all duration-300"
             >
               Next: Review Application
             </Button>
