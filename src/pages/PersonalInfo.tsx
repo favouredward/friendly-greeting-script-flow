@@ -7,10 +7,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { format } from "date-fns";
-import { CalendarIcon } from "lucide-react";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -32,8 +30,29 @@ const PersonalInfo = () => {
   const [loading, setLoading] = useState(false);
   const [validationErrors, setValidationErrors] = useState<{[key: string]: string}>({});
 
+  // African countries list
+  const africanCountries = [
+    "Algeria", "Angola", "Benin", "Botswana", "Burkina Faso", "Burundi", "Cabo Verde", "Cameroon",
+    "Central African Republic", "Chad", "Comoros", "Congo", "Democratic Republic of the Congo", 
+    "Djibouti", "Egypt", "Equatorial Guinea", "Eritrea", "Eswatini", "Ethiopia", "Gabon", "Gambia",
+    "Ghana", "Guinea", "Guinea-Bissau", "Ivory Coast", "Kenya", "Lesotho", "Liberia", "Libya",
+    "Madagascar", "Malawi", "Mali", "Mauritania", "Mauritius", "Morocco", "Mozambique", "Namibia",
+    "Niger", "Nigeria", "Rwanda", "Sao Tome and Principe", "Senegal", "Seychelles", "Sierra Leone",
+    "Somalia", "South Africa", "South Sudan", "Sudan", "Tanzania", "Togo", "Tunisia", "Uganda",
+    "Zambia", "Zimbabwe"
+  ];
+
   useEffect(() => {
     fetchCountriesAndPrograms();
+    // Load saved form data if exists
+    const savedData = localStorage.getItem('personalInfo');
+    if (savedData) {
+      const parsed = JSON.parse(savedData);
+      if (parsed.dateOfBirth) {
+        parsed.dateOfBirth = new Date(parsed.dateOfBirth);
+      }
+      setFormData(parsed);
+    }
   }, []);
 
   const fetchCountriesAndPrograms = async () => {
@@ -61,9 +80,9 @@ const PersonalInfo = () => {
   };
 
   const validatePhone = (phone: string) => {
-    const phoneRegex = /^[\+]?[1-9][\d]{3,14}$/;
-    const cleanPhone = phone.replace(/[\s\-\(\)]/g, '');
-    return phoneRegex.test(cleanPhone);
+    // More flexible phone validation - just check for minimum length and numbers
+    const cleanPhone = phone.replace(/[\s\-\(\)\+]/g, '');
+    return cleanPhone.length >= 7 && /^\d+$/.test(cleanPhone);
   };
 
   const handleInputChange = (field: string, value: string | Date | null) => {
@@ -71,6 +90,10 @@ const PersonalInfo = () => {
       ...prev,
       [field]: value
     }));
+
+    // Save to localStorage on every change
+    const updatedData = { ...formData, [field]: value };
+    localStorage.setItem('personalInfo', JSON.stringify(updatedData));
 
     // Clear validation error when user starts typing
     if (validationErrors[field]) {
@@ -91,11 +114,11 @@ const PersonalInfo = () => {
       errors.email = "Please enter a valid email address";
     }
     
-    // Validate phone number
+    // Validate phone number with more flexible approach
     if (!formData.phoneNumber) {
       errors.phoneNumber = "Phone number is required";
     } else if (!validatePhone(formData.phoneNumber)) {
-      errors.phoneNumber = "Please enter a valid phone number";
+      errors.phoneNumber = "Please enter a valid phone number (minimum 7 digits)";
     }
     
     // Check other required fields
@@ -115,7 +138,7 @@ const PersonalInfo = () => {
       return;
     }
 
-    // Store form data in localStorage for now (we'll use this in the employment step)
+    // Store form data in localStorage
     localStorage.setItem('personalInfo', JSON.stringify(formData));
     navigate('/apply/employment');
   };
@@ -170,6 +193,7 @@ const PersonalInfo = () => {
               <Input
                 id="phoneNumber"
                 type="tel"
+                placeholder="Enter your phone number with country code"
                 value={formData.phoneNumber}
                 onChange={(e) => handleInputChange('phoneNumber', e.target.value)}
                 className={cn("mt-1", validationErrors.phoneNumber && "border-red-500")}
@@ -181,30 +205,24 @@ const PersonalInfo = () => {
 
             <div>
               <Label>Date of Birth</Label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className={cn(
-                      "w-full justify-start text-left font-normal mt-1",
-                      !formData.dateOfBirth && "text-muted-foreground",
-                      validationErrors.dateOfBirth && "border-red-500"
-                    )}
-                  >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {formData.dateOfBirth ? format(formData.dateOfBirth, "MM/dd/yyyy") : "Select date"}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={formData.dateOfBirth || undefined}
-                    onSelect={(date) => handleInputChange('dateOfBirth', date || null)}
-                    initialFocus
-                    className="p-3 pointer-events-auto"
-                  />
-                </PopoverContent>
-              </Popover>
+              <div className="mt-1">
+                <DatePicker
+                  selected={formData.dateOfBirth}
+                  onChange={(date) => handleInputChange('dateOfBirth', date)}
+                  showMonthDropdown
+                  showYearDropdown
+                  dropdownMode="select"
+                  yearDropdownItemNumber={100}
+                  scrollableYearDropdown
+                  maxDate={new Date()}
+                  placeholderText="Select your date of birth"
+                  className={cn(
+                    "w-full px-3 py-2 border border-input bg-background rounded-md text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+                    validationErrors.dateOfBirth && "border-red-500"
+                  )}
+                  dateFormat="MM/dd/yyyy"
+                />
+              </div>
               {validationErrors.dateOfBirth && (
                 <p className="text-red-500 text-sm mt-1">{validationErrors.dateOfBirth}</p>
               )}
@@ -217,11 +235,12 @@ const PersonalInfo = () => {
                   <SelectValue placeholder="-- Select Country --" />
                 </SelectTrigger>
                 <SelectContent>
-                  {countries.map((country) => (
-                    <SelectItem key={country.id} value={country.name}>
-                      {country.name}
+                  {africanCountries.map((country) => (
+                    <SelectItem key={country} value={country}>
+                      {country}
                     </SelectItem>
                   ))}
+                  <SelectItem value="Other">Other (Not Listed)</SelectItem>
                 </SelectContent>
               </Select>
               {validationErrors.country && (
@@ -266,7 +285,7 @@ const PersonalInfo = () => {
           <div className="mt-8">
             <Button 
               onClick={handleNext}
-              disabled={loading}
+              disabled={loading || !isFormValid()}
               className="w-full bg-purple-600 hover:bg-purple-700 text-white py-3 shadow-lg hover:shadow-purple-500/25 transition-all duration-300"
             >
               {loading ? "Loading..." : "Next: Employment Info"}

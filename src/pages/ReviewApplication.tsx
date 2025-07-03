@@ -1,68 +1,46 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Navigation from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { format } from "date-fns";
 
 const ReviewApplication = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [personalInfo, setPersonalInfo] = useState<any>(null);
   const [employmentInfo, setEmploymentInfo] = useState<any>(null);
-  const [submitting, setSubmitting] = useState(false);
-  const [validationErrors, setValidationErrors] = useState<{[key: string]: string}>({});
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const personalData = localStorage.getItem('personalInfo');
-    const employmentData = localStorage.getItem('employmentInfo');
+    // Load data from localStorage
+    const personal = localStorage.getItem('personalInfo');
+    const employment = localStorage.getItem('employmentInfo');
     
-    if (!personalData || !employmentData) {
+    if (!personal) {
       navigate('/apply/personal');
       return;
     }
     
-    setPersonalInfo(JSON.parse(personalData));
-    setEmploymentInfo(JSON.parse(employmentData));
-  }, [navigate]);
+    if (!employment) {
+      navigate('/apply/employment');
+      return;
+    }
 
-  const validateInputs = () => {
-    const errors: {[key: string]: string} = {};
-    
-    // Email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(personalInfo.email)) {
-      errors.email = "Please enter a valid email address";
-    }
-    
-    // Phone validation (basic check for numbers and common formats)
-    const phoneRegex = /^[\+]?[1-9][\d]{3,14}$/;
-    const cleanPhone = personalInfo.phoneNumber.replace(/[\s\-\(\)]/g, '');
-    if (!phoneRegex.test(cleanPhone)) {
-      errors.phone = "Please enter a valid phone number";
-    }
-    
-    setValidationErrors(errors);
-    return Object.keys(errors).length === 0;
-  };
+    setPersonalInfo(JSON.parse(personal));
+    setEmploymentInfo(JSON.parse(employment));
+  }, [navigate]);
 
   const handleSubmit = async () => {
     if (!personalInfo || !employmentInfo) return;
-    
-    // Validate inputs before submitting
-    if (!validateInputs()) {
-      toast({
-        title: "Validation Error",
-        description: "Please check your email and phone number format.",
-        variant: "destructive"
-      });
-      return;
-    }
-    
-    setSubmitting(true);
+
+    setLoading(true);
     
     try {
-      // Prepare the application data for Supabase
+      // Prepare the data for submission
       const applicationData = {
         full_name: personalInfo.fullName,
         email: personalInfo.email,
@@ -78,75 +56,64 @@ const ReviewApplication = () => {
         status: 'submitted'
       };
 
-      console.log('Submitting application:', applicationData);
-
+      // Submit to database
       const { data, error } = await supabase
         .from('applications')
-        .insert(applicationData)
+        .insert([applicationData])
         .select()
         .single();
 
       if (error) {
-        console.error('Supabase error:', error);
         throw error;
       }
 
       console.log('Application submitted successfully:', data);
 
-      // Send email notification
+      // Send notification email
       try {
         const { error: emailError } = await supabase.functions.invoke('send-application-notification', {
           body: {
-            applicationData: {
-              id: data.id,
-              full_name: data.full_name,
-              email: data.email,
-              program: data.program,
-              created_at: data.created_at
-            }
+            applicantName: personalInfo.fullName,
+            applicantEmail: personalInfo.email,
+            program: personalInfo.program,
+            applicationId: data.id
           }
         });
 
         if (emailError) {
-          console.error('Email sending error:', emailError);
+          console.error('Email notification error:', emailError);
           // Don't fail the whole process if email fails
-        } else {
-          console.log('Email notification sent successfully');
         }
       } catch (emailError) {
-        console.error('Email notification failed:', emailError);
-        // Continue with success flow even if email fails
+        console.error('Failed to send email notification:', emailError);
       }
 
-      // Store the submitted application data for the success page
-      const completeApplicationData = {
-        ...personalInfo,
-        ...employmentInfo,
-        submittedAt: new Date().toISOString(),
-        applicationId: data.id
-      };
-      
-      localStorage.setItem('submittedApplication', JSON.stringify(completeApplicationData));
-      
-      // Clear form data
+      toast({
+        title: "Application Submitted Successfully!",
+        description: "Thank you for your application. You will receive a confirmation email shortly.",
+      });
+
+      // Clear localStorage and refresh the application
       localStorage.removeItem('personalInfo');
       localStorage.removeItem('employmentInfo');
       
-      toast({
-        title: "Success!",
-        description: "Your application has been submitted successfully. Check your email for confirmation.",
-      });
+      // Navigate to success page, then refresh after a delay
+      navigate('/success');
+      
+      // Auto-refresh the application after 3 seconds
+      setTimeout(() => {
+        window.location.reload();
+      }, 3000);
 
-      navigate('/apply/success');
     } catch (error: any) {
       console.error('Error submitting application:', error);
       toast({
-        title: "Error",
-        description: error.message || "Failed to submit application. Please try again.",
+        title: "Submission Failed",
+        description: error.message || "There was an error submitting your application. Please try again.",
         variant: "destructive"
       });
     } finally {
-      setSubmitting(false);
+      setLoading(false);
     }
   };
 
@@ -158,116 +125,103 @@ const ReviewApplication = () => {
     return <div>Loading...</div>;
   }
 
-  const formatDate = (dateString: string) => {
-    if (!dateString) return '';
-    const date = new Date(dateString);
-    return date.toLocaleDateString();
-  };
-
   return (
     <div className="min-h-screen bg-gray-50">
       <Navigation />
       
-      <div className="max-w-2xl mx-auto py-12 px-6">
+      <div className="max-w-4xl mx-auto py-12 px-6">
         <h1 className="text-3xl font-bold text-gray-900 mb-8 text-center">
           Step 3: Review Your Application
         </h1>
         
-        <div className="bg-white rounded-lg shadow-sm border p-8">
-          <div className="space-y-4">
-            <div className="border-b pb-2">
-              <span className="font-semibold text-gray-900">Full Name:</span>
-              <span className="ml-2 text-gray-700">{personalInfo.fullName}</span>
-            </div>
-            
-            <div className="border-b pb-2">
-              <span className="font-semibold text-gray-900">Email:</span>
-              <span className="ml-2 text-gray-700">{personalInfo.email}</span>
-              {validationErrors.email && (
-                <p className="text-red-500 text-sm mt-1">{validationErrors.email}</p>
-              )}
-            </div>
-            
-            <div className="border-b pb-2">
-              <span className="font-semibold text-gray-900">Phone Number:</span>
-              <span className="ml-2 text-gray-700">{personalInfo.phoneNumber}</span>
-              {validationErrors.phone && (
-                <p className="text-red-500 text-sm mt-1">{validationErrors.phone}</p>
-              )}
-            </div>
-            
-            <div className="border-b pb-2">
-              <span className="font-semibold text-gray-900">Date of Birth:</span>
-              <span className="ml-2 text-gray-700">{formatDate(personalInfo.dateOfBirth)}</span>
-            </div>
-            
-            <div className="border-b pb-2">
-              <span className="font-semibold text-gray-900">Country:</span>
-              <span className="ml-2 text-gray-700">{personalInfo.country}</span>
-            </div>
-            
-            <div className="border-b pb-2">
-              <span className="font-semibold text-gray-900">Address:</span>
-              <span className="ml-2 text-gray-700">{personalInfo.address}</span>
-            </div>
-            
-            <div className="border-b pb-2">
-              <span className="font-semibold text-gray-900">Program:</span>
-              <span className="ml-2 text-gray-700">{personalInfo.program}</span>
-            </div>
-            
-            <div className="border-b pb-2">
-              <span className="font-semibold text-gray-900">Employment Status:</span>
-              <span className="ml-2 text-gray-700">{employmentInfo.employmentStatus}</span>
-            </div>
-            
-            <div className="border-b pb-2">
-              <span className="font-semibold text-gray-900">Years of Experience:</span>
-              <span className="ml-2 text-gray-700">{employmentInfo.yearsOfExperience}</span>
-            </div>
-            
-            {employmentInfo.currentEmployer && (
-              <div className="border-b pb-2">
-                <span className="font-semibold text-gray-900">Current Employer:</span>
-                <span className="ml-2 text-gray-700">{employmentInfo.currentEmployer}</span>
+        <div className="grid md:grid-cols-2 gap-6 mb-8">
+          {/* Personal Information Card */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-purple-600">Personal Information</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <label className="font-medium text-gray-700">Full Name:</label>
+                <p className="text-gray-900">{personalInfo.fullName}</p>
               </div>
-            )}
-            
-            {employmentInfo.salary && (
-              <div className="border-b pb-2">
-                <span className="font-semibold text-gray-900">Salary:</span>
-                <span className="ml-2 text-gray-700">{employmentInfo.salary}</span>
+              <div>
+                <label className="font-medium text-gray-700">Email:</label>
+                <p className="text-gray-900">{personalInfo.email}</p>
               </div>
-            )}
-          </div>
+              <div>
+                <label className="font-medium text-gray-700">Phone Number:</label>
+                <p className="text-gray-900">{personalInfo.phoneNumber}</p>
+              </div>
+              <div>
+                <label className="font-medium text-gray-700">Date of Birth:</label>
+                <p className="text-gray-900">
+                  {personalInfo.dateOfBirth ? format(new Date(personalInfo.dateOfBirth), 'MM/dd/yyyy') : 'Not provided'}
+                </p>
+              </div>
+              <div>
+                <label className="font-medium text-gray-700">Country:</label>
+                <p className="text-gray-900">{personalInfo.country}</p>
+              </div>
+              <div>
+                <label className="font-medium text-gray-700">Address:</label>
+                <p className="text-gray-900">{personalInfo.address}</p>
+              </div>
+              <div>
+                <label className="font-medium text-gray-700">Program:</label>
+                <p className="text-gray-900">{personalInfo.program}</p>
+              </div>
+            </CardContent>
+          </Card>
 
-          <div className="mt-8 flex gap-4">
-            <Button 
-              onClick={handleBack}
-              variant="outline"
-              className="flex-1"
-              disabled={submitting}
-            >
-              Back
-            </Button>
-            <Button 
-              onClick={handleSubmit}
-              disabled={submitting}
-              className="flex-1 bg-purple-600 hover:bg-purple-700 text-white shadow-lg hover:shadow-purple-500/25 transition-all duration-300"
-            >
-              {submitting ? "Submitting..." : "Confirm & Submit"}
-            </Button>
-          </div>
+          {/* Employment Information Card */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-purple-600">Employment Information</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <label className="font-medium text-gray-700">Employment Status:</label>
+                <p className="text-gray-900">{employmentInfo.employmentStatus}</p>
+              </div>
+              <div>
+                <label className="font-medium text-gray-700">Years of Experience:</label>
+                <p className="text-gray-900">{employmentInfo.yearsOfExperience}</p>
+              </div>
+              {employmentInfo.currentEmployer && (
+                <div>
+                  <label className="font-medium text-gray-700">Current/Previous Employer:</label>
+                  <p className="text-gray-900">{employmentInfo.currentEmployer}</p>
+                </div>
+              )}
+              {employmentInfo.salary && (
+                <div>
+                  <label className="font-medium text-gray-700">Salary Information:</label>
+                  <p className="text-gray-900">{employmentInfo.salary}</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+
+        <div className="flex gap-4">
+          <Button 
+            onClick={handleBack}
+            variant="outline"
+            className="flex-1"
+            disabled={loading}
+          >
+            Back to Employment Info
+          </Button>
+          <Button 
+            onClick={handleSubmit}
+            disabled={loading}
+            className="flex-1 bg-purple-600 hover:bg-purple-700 text-white shadow-lg hover:shadow-purple-500/25 transition-all duration-300"
+          >
+            {loading ? "Submitting..." : "Submit Application"}
+          </Button>
         </div>
       </div>
-      
-      <footer className="bg-white py-8 border-t mt-12">
-        <div className="max-w-6xl mx-auto text-center px-6">
-          <p className="text-gray-600">
-            © 2025 BlacTech Scholarship Portal. All rights reserved.
-          </p>
-        </div>
-      </footer>
     </div>
   );
 };
