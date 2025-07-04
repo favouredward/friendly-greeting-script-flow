@@ -2,7 +2,7 @@
 import Navigation from "@/components/Navigation";
 import ProcessCard from "@/components/ProcessCard";
 import { Button } from "@/components/ui/button";
-import { GraduationCap, Rocket, Clipboard } from "lucide-react";
+import { Monitor, Rocket, Clipboard } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const Index = () => {
@@ -15,7 +15,7 @@ const Index = () => {
         <div className="max-w-4xl mx-auto text-center px-6">
           <div className="flex items-center justify-center mb-6">
             <div className="bg-purple-100 p-3 rounded-full mr-4">
-              <GraduationCap className="w-12 h-12 text-purple-600" />
+              <Monitor className="w-12 h-12 text-purple-600" />
             </div>
             <h1 className="text-4xl md:text-5xl font-bold text-gray-900 bg-gradient-to-r from-purple-600 to-purple-800 bg-clip-text text-transparent">
               Apply now for a BlacTech Scholarship
@@ -25,7 +25,7 @@ const Index = () => {
             Fill out your application easily! Fast approval & secure a spot.
           </p>
           <Link to="/apply/personal">
-            <Button className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white px-12 py-6 text-xl font-semibold rounded-lg shadow-lg hover:shadow-purple-500/50 transform hover:scale-110 transition-all duration-300">
+            <Button className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-12 py-6 text-xl font-semibold rounded-lg shadow-lg hover:shadow-green-500/50 transform hover:scale-110 transition-all duration-300">
               <Rocket className="w-6 h-6 mr-3" />
               Apply Now
             </Button>

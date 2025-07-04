@@ -11,10 +11,10 @@ const Navigation = () => {
           <Link to="/" className="flex items-center space-x-3">
             <img 
               src="/placeholder.svg" 
-              alt="BlacTech Logo" 
+              alt="Logo" 
               className="h-10 w-10 rounded-full border-2 border-white/20"
             />
-            <span className="text-xl font-bold">BlacTech Scholars</span>
+            {/* Space reserved for your SVG logo */}
           </Link>
           <div className="hidden md:flex space-x-6">
             <Link 
@@ -36,10 +36,12 @@ const Navigation = () => {
               <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-purple-200 transition-all duration-300 group-hover:w-full"></span>
             </Link>
             <a 
-              href="#" 
+              href="https://blactechafrica.com" 
+              target="_blank"
+              rel="noopener noreferrer"
               className="hover:text-purple-200 transition-colors duration-300 relative group"
             >
-              BTIA-Official
+              BTIA
               <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-purple-200 transition-all duration-300 group-hover:w-full"></span>
             </a>
           </div>
