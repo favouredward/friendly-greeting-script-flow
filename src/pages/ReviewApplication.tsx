@@ -69,6 +69,14 @@ const ReviewApplication = () => {
 
       console.log('Application submitted successfully:', data);
 
+      // Store submitted data for success page
+      localStorage.setItem('submittedApplication', JSON.stringify({
+        ...personalInfo,
+        ...employmentInfo,
+        applicationId: data.id,
+        submittedAt: new Date().toISOString()
+      }));
+
       // Send notification email
       try {
         const { error: emailError } = await supabase.functions.invoke('send-application-notification', {
@@ -93,17 +101,12 @@ const ReviewApplication = () => {
         description: "Thank you for your application. You will receive a confirmation email shortly.",
       });
 
-      // Clear localStorage and refresh the application
+      // Clear form data from localStorage
       localStorage.removeItem('personalInfo');
       localStorage.removeItem('employmentInfo');
       
-      // Navigate to success page, then refresh after a delay
-      navigate('/success');
-      
-      // Auto-refresh the application after 3 seconds
-      setTimeout(() => {
-        window.location.reload();
-      }, 3000);
+      // Navigate to success page with correct route
+      navigate('/apply/success');
 
     } catch (error: any) {
       console.error('Error submitting application:', error);

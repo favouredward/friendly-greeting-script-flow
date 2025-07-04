@@ -10,12 +10,11 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-interface ApplicationData {
-  id: string;
-  full_name: string;
-  email: string;
+interface NotificationRequest {
+  applicantName: string;
+  applicantEmail: string;
   program: string;
-  created_at: string;
+  applicationId: string;
 }
 
 const handler = async (req: Request): Promise<Response> => {
@@ -24,14 +23,14 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const { applicationData }: { applicationData: ApplicationData } = await req.json();
+    const { applicantName, applicantEmail, program, applicationId }: NotificationRequest = await req.json();
     
-    console.log("Sending notification email for application:", applicationData.id);
+    console.log("Sending notification email for application:", applicationId);
 
     // Send confirmation email to applicant from your custom domain
     const applicantEmailResponse = await resend.emails.send({
       from: "BlacTech Scholarship Portal <support@blactechafrica.com>",
-      to: [applicationData.email],
+      to: [applicantEmail],
       subject: "Application Submitted Successfully - BlacTech Scholarship",
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
@@ -40,16 +39,16 @@ const handler = async (req: Request): Promise<Response> => {
           </div>
           
           <div style="background: #f8fafc; padding: 25px; border-radius: 8px; margin-bottom: 25px;">
-            <h2 style="color: #7c3aed; margin-top: 0;">Dear ${applicationData.full_name},</h2>
+            <h2 style="color: #7c3aed; margin-top: 0;">Dear ${applicantName},</h2>
             <p style="font-size: 16px; line-height: 1.6; color: #374151;">
               Thank you for applying to the <strong>BlacTech Scholarship Program</strong>! We're excited to review your application.
             </p>
             
             <div style="background: white; padding: 20px; border-radius: 6px; border-left: 4px solid #7c3aed; margin: 20px 0;">
               <h3 style="margin: 0 0 10px 0; color: #7c3aed;">Application Details:</h3>
-              <p style="margin: 5px 0; color: #6b7280;"><strong>Application ID:</strong> ${applicationData.id}</p>
-              <p style="margin: 5px 0; color: #6b7280;"><strong>Program:</strong> ${applicationData.program}</p>
-              <p style="margin: 5px 0; color: #6b7280;"><strong>Submitted:</strong> ${new Date(applicationData.created_at).toLocaleDateString()}</p>
+              <p style="margin: 5px 0; color: #6b7280;"><strong>Application ID:</strong> ${applicationId}</p>
+              <p style="margin: 5px 0; color: #6b7280;"><strong>Program:</strong> ${program}</p>
+              <p style="margin: 5px 0; color: #6b7280;"><strong>Submitted:</strong> ${new Date().toLocaleDateString()}</p>
             </div>
           </div>
           
