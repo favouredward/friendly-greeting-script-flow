@@ -28,9 +28,9 @@ const handler = async (req: Request): Promise<Response> => {
     
     console.log("Sending notification email for application:", applicationData.id);
 
-    // Send confirmation email to applicant
+    // Send confirmation email to applicant from your custom domain
     const applicantEmailResponse = await resend.emails.send({
-      from: "BlacTech Scholarship Portal <onboarding@resend.dev>",
+      from: "BlacTech Scholarship Portal <support@blactechafrica.com>",
       to: [applicationData.email],
       subject: "Application Submitted Successfully - BlacTech Scholarship",
       html: `
@@ -64,10 +64,10 @@ const handler = async (req: Request): Promise<Response> => {
           
           <div style="text-align: center; padding: 20px; border-top: 1px solid #e5e7eb;">
             <p style="color: #6b7280; margin: 0;">
-              Questions? Contact us at <a href="mailto:support@blactech.com" style="color: #7c3aed;">support@blactech.com</a>
+              Questions? Contact us at <a href="mailto:support@blactechafrica.com" style="color: #7c3aed;">support@blactechafrica.com</a>
             </p>
             <p style="color: #9ca3af; font-size: 14px; margin-top: 15px;">
-              © 2025 BlacTech Scholarship Portal. All rights reserved.
+              © 2025 BlacTech Africa. All rights reserved.
             </p>
           </div>
         </div>

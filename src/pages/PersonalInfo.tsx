@@ -193,7 +193,7 @@ const PersonalInfo = () => {
               <Input
                 id="phoneNumber"
                 type="tel"
-                placeholder="Enter your phone number with country code"
+                placeholder="Enter your phone number in any format"
                 value={formData.phoneNumber}
                 onChange={(e) => handleInputChange('phoneNumber', e.target.value)}
                 className={cn("mt-1", validationErrors.phoneNumber && "border-red-500")}
@@ -208,7 +208,7 @@ const PersonalInfo = () => {
               <div className="mt-1">
                 <DatePicker
                   selected={formData.dateOfBirth}
-                  onChange={(date) => handleInputChange('dateOfBirth', date)}
+                  onChange={(date: Date | null) => handleInputChange('dateOfBirth', date)}
                   showMonthDropdown
                   showYearDropdown
                   dropdownMode="select"
