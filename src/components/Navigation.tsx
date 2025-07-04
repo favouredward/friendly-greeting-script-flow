@@ -1,8 +1,13 @@
 
 import { Link, useLocation } from "react-router-dom";
+import { Menu, X } from "lucide-react";
+import { useState } from "react";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const Navigation = () => {
   const location = useLocation();
+  const isMobile = useIsMobile();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   
   return (
     <nav className="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-6 py-4 shadow-lg sticky top-0 z-50 backdrop-blur-sm">
@@ -16,6 +21,8 @@ const Navigation = () => {
             />
             {/* Space reserved for your SVG logo */}
           </Link>
+          
+          {/* Desktop Navigation */}
           <div className="hidden md:flex space-x-6">
             <Link 
               to="/" 
@@ -46,7 +53,52 @@ const Navigation = () => {
             </a>
           </div>
         </div>
+
+        {/* Mobile Menu Button */}
+        <div className="md:hidden">
+          <button
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            className="text-white hover:text-purple-200 transition-colors"
+          >
+            {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
+        </div>
       </div>
+
+      {/* Mobile Navigation Menu */}
+      {isMenuOpen && isMobile && (
+        <div className="md:hidden mt-4 pb-4 border-t border-purple-500/30">
+          <div className="flex flex-col space-y-4 pt-4">
+            <Link 
+              to="/" 
+              className={`hover:text-purple-200 transition-colors duration-300 ${
+                location.pathname === '/' ? 'text-purple-200' : ''
+              }`}
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Home
+            </Link>
+            <Link 
+              to="/apply/personal" 
+              className={`hover:text-purple-200 transition-colors duration-300 ${
+                location.pathname.includes('/apply') ? 'text-purple-200' : ''
+              }`}
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Apply
+            </Link>
+            <a 
+              href="https://blactechafrica.com" 
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-purple-200 transition-colors duration-300"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              BTIA
+            </a>
+          </div>
+        </div>
+      )}
     </nav>
   );
 };
