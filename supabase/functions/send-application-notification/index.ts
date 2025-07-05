@@ -29,9 +29,9 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Send confirmation email to applicant from your custom domain
     const applicantEmailResponse = await resend.emails.send({
-      from: "BlacTech Scholarship Portal <support@blactechafrica.com>",
+      from: "BlacTech Training Portal <support@blactechafrica.com>",
       to: [applicantEmail],
-      subject: "Application Submitted Successfully - BlacTech Scholarship",
+      subject: "Application Submitted Successfully - BlacTech Training Program",
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
           <div style="background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%); padding: 30px; border-radius: 10px; text-align: center; margin-bottom: 30px;">
@@ -41,12 +41,13 @@ const handler = async (req: Request): Promise<Response> => {
           <div style="background: #f8fafc; padding: 25px; border-radius: 8px; margin-bottom: 25px;">
             <h2 style="color: #7c3aed; margin-top: 0;">Dear ${applicantName},</h2>
             <p style="font-size: 16px; line-height: 1.6; color: #374151;">
-              Thank you for applying to the <strong>BlacTech Scholarship Program</strong>! We're excited to review your application.
+              Thank you for applying to the <strong>BlacTech Training Program</strong>! We're excited to review your application.
             </p>
             
             <div style="background: white; padding: 20px; border-radius: 6px; border-left: 4px solid #7c3aed; margin: 20px 0;">
               <h3 style="margin: 0 0 10px 0; color: #7c3aed;">Application Details:</h3>
-              <p style="margin: 5px 0; color: #6b7280;"><strong>Application ID:</strong> ${applicationId}</p>
+              <p style="margin: 5px 0; color: #6b7280;"><strong>Applicant Name:</strong> ${applicantName}</p>
+              <p style="margin: 5px 0; color: #6b7280;"><strong>Email:</strong> ${applicantEmail}</p>
               <p style="margin: 5px 0; color: #6b7280;"><strong>Program:</strong> ${program}</p>
               <p style="margin: 5px 0; color: #6b7280;"><strong>Submitted:</strong> ${new Date().toLocaleDateString()}</p>
             </div>
@@ -66,7 +67,7 @@ const handler = async (req: Request): Promise<Response> => {
               Questions? Contact us at <a href="mailto:support@blactechafrica.com" style="color: #7c3aed;">support@blactechafrica.com</a>
             </p>
             <p style="color: #9ca3af; font-size: 14px; margin-top: 15px;">
-              © 2025 BlacTech Africa. All rights reserved.
+              © 2025 BlacTech Institute Africa. All rights reserved.
             </p>
           </div>
         </div>

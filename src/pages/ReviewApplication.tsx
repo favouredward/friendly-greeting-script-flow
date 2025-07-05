@@ -52,7 +52,7 @@ const ReviewApplication = () => {
         employment_status: employmentInfo.employmentStatus,
         years_of_experience: parseInt(employmentInfo.yearsOfExperience) || 0,
         current_employer: employmentInfo.currentEmployer || null,
-        salary: employmentInfo.salary || null,
+        salary: null,
         status: 'submitted'
       };
 
@@ -195,12 +195,6 @@ const ReviewApplication = () => {
                 <div>
                   <label className="font-medium text-gray-700">Current/Previous Employer:</label>
                   <p className="text-gray-900">{employmentInfo.currentEmployer}</p>
-                </div>
-              )}
-              {employmentInfo.salary && (
-                <div>
-                  <label className="font-medium text-gray-700">Salary Information:</label>
-                  <p className="text-gray-900">{employmentInfo.salary}</p>
                 </div>
               )}
             </CardContent>

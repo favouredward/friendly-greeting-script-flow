@@ -12,8 +12,7 @@ const EmploymentInfo = () => {
   const [formData, setFormData] = useState({
     employmentStatus: '',
     yearsOfExperience: '',
-    currentEmployer: '',
-    salary: ''
+    currentEmployer: ''
   });
 
   useEffect(() => {
@@ -95,18 +94,6 @@ const EmploymentInfo = () => {
                 type="text"
                 value={formData.currentEmployer}
                 onChange={(e) => handleInputChange('currentEmployer', e.target.value)}
-                className="mt-1"
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="salary">Salary Information (Optional)</Label>
-              <Input
-                id="salary"
-                type="text"
-                placeholder="e.g., $50,000 per year"
-                value={formData.salary}
-                onChange={(e) => handleInputChange('salary', e.target.value)}
                 className="mt-1"
               />
             </div>
