@@ -11,11 +11,11 @@ const Index = () => {
       <Navigation />
       
       {/* Hero Section */}
-      <div className="bg-gradient-to-br from-purple-50 to-purple-100 py-8 md:py-16">
-        <div className="max-w-4xl mx-auto text-center px-4 md:px-6">
-          <div className="flex flex-col md:flex-row items-center justify-center mb-6 md:mb-8">
+            <div className="bg-gradient-to-br from-purple-50 to-purple-100 py-8 md:py-16">
+        <div className="max-w-4xl mx-auto px-4 md:px-6">
+          <div className="flex flex-col items-center justify-center mb-8 md:mb-12">
             {/* Creative Tech Icon Stack */}
-            <div className="relative mb-4 md:mb-0 md:mr-6">
+            <div className="relative mb-8 md:mb-12"> {/* Increased margin-bottom for better spacing */}
               <div className="bg-gradient-to-br from-purple-100 to-purple-200 p-4 md:p-6 rounded-2xl shadow-lg">
                 <div className="relative">
                   <Monitor className="w-16 h-16 md:w-20 md:h-20 text-purple-600" />
@@ -26,22 +26,26 @@ const Index = () => {
               </div>
             </div>
             
-            <div className="text-center md:text-left">
+            {/* Text Content - now properly centered */}
+            <div className="text-center w-full">
               <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-black mb-4">
                 Application Open!
               </h1>
-              <p className="text-lg md:text-xl text-black max-w-2xl">
+              <p className="text-lg md:text-xl text-black mx-auto max-w-2xl">
                 Apply now to join our next batch for The Tech Career and Upskilling Program.
               </p>
             </div>
           </div>
           
-          <Link to="/apply/personal">
-            <Button className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-8 md:px-12 py-4 md:py-6 text-lg md:text-xl font-semibold rounded-lg shadow-lg hover:shadow-green-500/50 transform hover:scale-105 transition-all duration-300">
-              <Rocket className="w-5 h-5 md:w-6 md:h-6 mr-2 md:mr-3" />
-              Apply Now
-            </Button>
-          </Link>
+          {/* Button - centered */}
+          <div className="text-center">
+            <Link to="/apply/personal">
+              <Button className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-8 md:px-12 py-4 md:py-6 text-lg md:text-xl font-semibold rounded-lg shadow-lg hover:shadow-green-500/50 transform hover:scale-105 transition-all duration-300">
+                <Rocket className="w-5 h-5 md:w-6 md:h-6 mr-2 md:mr-3" />
+                Apply Now
+              </Button>
+            </Link>
+          </div>
         </div>
       </div>
 
@@ -67,13 +71,13 @@ const Index = () => {
             <ProcessCard
               number="2"
               title="Approval & Email"
-              description="We review & send you a congratulatory email along with login details."
+              description="We review & send you a congratulatory email along with program details."
               borderColor="border-green-500"
             />
             <ProcessCard
               number="3"
               title="Pay & Access Dashboard"
-              description="Make payment & unlock your dashboard for full scholarship benefits."
+              description="Make payment & unlock your dashboard for full training benefits."
               borderColor="border-yellow-500"
             />
           </div>

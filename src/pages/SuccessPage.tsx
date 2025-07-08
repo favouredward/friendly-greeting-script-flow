@@ -113,21 +113,13 @@ const SuccessPage = () => {
           
           <div className="mt-8 text-center">
             <Link to="/">
-              <Button className="bg-blue-600 hover:bg-blue-700 text-white px-8">
+              <Button className="bg-green-600 hover:bg-green-700 text-white px-8">
                 Return to Home
               </Button>
             </Link>
           </div>
         </div>
       </div>
-      
-      <footer className="bg-white py-8 border-t">
-        <div className="max-w-6xl mx-auto text-center px-6">
-          <p className="text-gray-600">
-            © 2025 BlacTech Scholarship Portal. All rights reserved.
-          </p>
-        </div>
-      </footer>
     </div>
   );
 };

@@ -17,7 +17,7 @@ const Navigation = () => {
             <img 
               src="/placeholder.svg" 
               alt="Logo" 
-              className="h-10 w-10 rounded-full border-2 border-white/20"
+              className="h-10 w-15"
             />
             {/* Space reserved for your SVG logo */}
           </Link>
