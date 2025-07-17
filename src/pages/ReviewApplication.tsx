@@ -12,30 +12,22 @@ const ReviewApplication = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [personalInfo, setPersonalInfo] = useState<any>(null);
-  const [employmentInfo, setEmploymentInfo] = useState<any>(null);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     // Load data from localStorage
     const personal = localStorage.getItem('personalInfo');
-    const employment = localStorage.getItem('employmentInfo');
     
     if (!personal) {
       navigate('/apply/personal');
       return;
     }
-    
-    if (!employment) {
-      navigate('/apply/employment');
-      return;
-    }
 
     setPersonalInfo(JSON.parse(personal));
-    setEmploymentInfo(JSON.parse(employment));
   }, [navigate]);
 
   const handleSubmit = async () => {
-    if (!personalInfo || !employmentInfo) return;
+    if (!personalInfo) return;
 
     setLoading(true);
     
@@ -47,12 +39,11 @@ const ReviewApplication = () => {
         phone_number: personalInfo.phoneNumber,
         date_of_birth: personalInfo.dateOfBirth,
         country: personalInfo.country,
-        address: personalInfo.address,
+        address: personalInfo.address, // This now contains the state
         program: personalInfo.program,
-        employment_status: employmentInfo.employmentStatus,
-        years_of_experience: parseInt(employmentInfo.yearsOfExperience) || 0,
-        current_employer: employmentInfo.currentEmployer || null,
-        salary: null,
+        employment_status: personalInfo.employmentStatus,
+        years_of_experience: parseInt(personalInfo.yearsOfExperience) || 0,
+        current_employer: personalInfo.currentEmployer || null,
         status: 'submitted'
       };
 
@@ -72,7 +63,6 @@ const ReviewApplication = () => {
       // Store submitted data for success page
       localStorage.setItem('submittedApplication', JSON.stringify({
         ...personalInfo,
-        ...employmentInfo,
         applicationId: data.id,
         submittedAt: new Date().toISOString()
       }));
@@ -105,7 +95,7 @@ const ReviewApplication = () => {
       localStorage.removeItem('personalInfo');
       localStorage.removeItem('employmentInfo');
       
-      // Navigate to success page with correct route
+      // Navigate to success page
       navigate('/apply/success');
 
     } catch (error: any) {
@@ -121,10 +111,10 @@ const ReviewApplication = () => {
   };
 
   const handleBack = () => {
-    navigate('/apply/employment');
+    navigate('/apply/personal');
   };
 
-  if (!personalInfo || !employmentInfo) {
+  if (!personalInfo) {
     return <div>Loading...</div>;
   }
 
@@ -134,7 +124,7 @@ const ReviewApplication = () => {
       
       <div className="max-w-4xl mx-auto py-12 px-6">
         <h1 className="text-3xl font-bold text-gray-900 mb-8 text-center">
-          Step 3: Review Your Application
+          Review Your Application
         </h1>
         
         <div className="grid md:grid-cols-2 gap-6 mb-8">
@@ -167,7 +157,7 @@ const ReviewApplication = () => {
                 <p className="text-gray-900">{personalInfo.country}</p>
               </div>
               <div>
-                <label className="font-medium text-gray-700">Address:</label>
+                <label className="font-medium text-gray-700">State/Region:</label>
                 <p className="text-gray-900">{personalInfo.address}</p>
               </div>
               <div>
@@ -185,16 +175,16 @@ const ReviewApplication = () => {
             <CardContent className="space-y-4">
               <div>
                 <label className="font-medium text-gray-700">Employment Status:</label>
-                <p className="text-gray-900">{employmentInfo.employmentStatus}</p>
+                <p className="text-gray-900">{personalInfo.employmentStatus}</p>
               </div>
               <div>
                 <label className="font-medium text-gray-700">Years of Experience:</label>
-                <p className="text-gray-900">{employmentInfo.yearsOfExperience}</p>
+                <p className="text-gray-900">{personalInfo.yearsOfExperience}</p>
               </div>
-              {employmentInfo.currentEmployer && (
+              {personalInfo.currentEmployer && (
                 <div>
                   <label className="font-medium text-gray-700">Current/Previous Employer:</label>
-                  <p className="text-gray-900">{employmentInfo.currentEmployer}</p>
+                  <p className="text-gray-900">{personalInfo.currentEmployer}</p>
                 </div>
               )}
             </CardContent>
@@ -208,12 +198,12 @@ const ReviewApplication = () => {
             className="flex-1"
             disabled={loading}
           >
-            Back to Employment Info
+            Back to Personal Info
           </Button>
           <Button 
             onClick={handleSubmit}
             disabled={loading}
-            className="flex-1 bg-purple-600 hover:bg-purple-700 text-white shadow-lg hover:shadow-purple-500/25 transition-all duration-300"
+            className="flex-1 bg-green-600 hover:bg-green-700 text-white shadow-lg hover:shadow-green-500/25 transition-all duration-300"
           >
             {loading ? "Submitting..." : "Submit Application"}
           </Button>

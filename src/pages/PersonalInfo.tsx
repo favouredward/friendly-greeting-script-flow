@@ -22,15 +22,27 @@ const PersonalInfo = () => {
     phoneNumber: '',
     dateOfBirth: null as Date | null,
     country: '',
-    address: '',
-    program: ''
+    state: '',
+    program: '',
+    employmentStatus: '',
+    yearsOfExperience: '',
+    currentEmployer: ''
   });
   const [countries, setCountries] = useState<Array<{id: number, name: string, code: string}>>([]);
   const [programs, setPrograms] = useState<Array<{id: number, name: string, description: string}>>([]);
   const [loading, setLoading] = useState(false);
   const [validationErrors, setValidationErrors] = useState<{[key: string]: string}>({});
 
-  // African countries list
+  // African countries with their states
+  const countryStates: {[key: string]: string[]} = {
+    "Nigeria": ["Lagos", "Abuja", "Kano", "Rivers", "Oyo", "Kaduna", "Anambra", "Enugu", "Delta", "Imo", "Edo", "Osun", "Ogun", "Katsina", "Sokoto", "Borno", "Adamawa", "Plateau", "Cross River", "Akwa Ibom", "Ondo", "Kwara", "Abia", "Bauchi", "Taraba", "Niger", "Jigawa", "Gombe", "Kebbi", "Yobe", "Zamfara", "Nasarawa", "Kogi", "Ebonyi", "Ekiti", "Bayelsa"],
+    "Ghana": ["Greater Accra", "Ashanti", "Western", "Central", "Eastern", "Volta", "Northern", "Upper East", "Upper West", "Brong-Ahafo"],
+    "Kenya": ["Nairobi", "Mombasa", "Kisumu", "Nakuru", "Eldoret", "Thika", "Malindi", "Kitale", "Garissa", "Kakamega", "Machakos", "Meru", "Nyeri", "Kericho", "Embu"],
+    "South Africa": ["Gauteng", "Western Cape", "KwaZulu-Natal", "Eastern Cape", "Limpopo", "Mpumalanga", "North West", "Free State", "Northern Cape"],
+    "Egypt": ["Cairo", "Alexandria", "Giza", "Shubra El-Kheima", "Port Said", "Suez", "Luxor", "Mansoura", "El-Mahalla El-Kubra", "Tanta", "Asyut", "Ismailia", "Fayyum", "Zagazig", "Aswan"],
+    "Morocco": ["Casablanca", "Rabat", "Fes", "Marrakech", "Agadir", "Tangier", "Meknes", "Oujda", "Kenitra", "Tetouan", "Safi", "El Jadida", "Nador", "Beni Mellal", "Taza"]
+  };
+
   const africanCountries = [
     "Algeria", "Angola", "Benin", "Botswana", "Burkina Faso", "Burundi", "Cabo Verde", "Cameroon",
     "Central African Republic", "Chad", "Comoros", "Congo", "Democratic Republic of the Congo", 
@@ -40,6 +52,10 @@ const PersonalInfo = () => {
     "Niger", "Nigeria", "Rwanda", "Sao Tome and Principe", "Senegal", "Seychelles", "Sierra Leone",
     "Somalia", "South Africa", "South Sudan", "Sudan", "Tanzania", "Togo", "Tunisia", "Uganda",
     "Zambia", "Zimbabwe"
+  ];
+
+  const employmentStatuses = [
+    "Employed", "Unemployed", "Self-employed", "Student", "Freelancer"
   ];
 
   useEffect(() => {
@@ -80,19 +96,27 @@ const PersonalInfo = () => {
   };
 
   const validatePhone = (phone: string) => {
-    // More flexible phone validation - just check for minimum length and numbers
     const cleanPhone = phone.replace(/[\s\-\(\)\+]/g, '');
     return cleanPhone.length >= 7 && /^\d+$/.test(cleanPhone);
   };
 
   const handleInputChange = (field: string, value: string | Date | null) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value
-    }));
+    setFormData(prev => {
+      const updated = { ...prev, [field]: value };
+      
+      // Reset state when country changes
+      if (field === 'country') {
+        updated.state = '';
+      }
+      
+      return updated;
+    });
 
     // Save to localStorage on every change
     const updatedData = { ...formData, [field]: value };
+    if (field === 'country') {
+      updatedData.state = '';
+    }
     localStorage.setItem('personalInfo', JSON.stringify(updatedData));
 
     // Clear validation error when user starts typing
@@ -114,7 +138,7 @@ const PersonalInfo = () => {
       errors.email = "Please enter a valid email address";
     }
     
-    // Validate phone number with more flexible approach
+    // Validate phone number
     if (!formData.phoneNumber) {
       errors.phoneNumber = "Phone number is required";
     } else if (!validatePhone(formData.phoneNumber)) {
@@ -125,8 +149,10 @@ const PersonalInfo = () => {
     if (!formData.fullName) errors.fullName = "Full name is required";
     if (!formData.dateOfBirth) errors.dateOfBirth = "Date of birth is required";
     if (!formData.country) errors.country = "Country is required";
-    if (!formData.address) errors.address = "Address is required";
+    if (!formData.state) errors.state = "State is required";
     if (!formData.program) errors.program = "Program is required";
+    if (!formData.employmentStatus) errors.employmentStatus = "Employment status is required";
+    if (!formData.yearsOfExperience) errors.yearsOfExperience = "Years of experience is required";
     
     if (Object.keys(errors).length > 0) {
       setValidationErrors(errors);
@@ -138,15 +164,41 @@ const PersonalInfo = () => {
       return;
     }
 
-    // Store form data in localStorage
-    localStorage.setItem('personalInfo', JSON.stringify(formData));
-    navigate('/apply/employment');
+    // Store form data in localStorage with employment info included
+    const applicationData = {
+      // Personal info
+      fullName: formData.fullName,
+      email: formData.email,
+      phoneNumber: formData.phoneNumber,
+      dateOfBirth: formData.dateOfBirth,
+      country: formData.country,
+      address: formData.state, // Using state as address for compatibility
+      program: formData.program,
+      // Employment info
+      employmentStatus: formData.employmentStatus,
+      yearsOfExperience: formData.yearsOfExperience,
+      currentEmployer: formData.currentEmployer
+    };
+    
+    localStorage.setItem('personalInfo', JSON.stringify(applicationData));
+    localStorage.setItem('employmentInfo', JSON.stringify({
+      employmentStatus: formData.employmentStatus,
+      yearsOfExperience: formData.yearsOfExperience,
+      currentEmployer: formData.currentEmployer
+    }));
+    
+    navigate('/apply/review');
   };
 
   const isFormValid = () => {
     return formData.fullName && formData.email && formData.phoneNumber && 
-           formData.dateOfBirth && formData.country && formData.address && formData.program &&
+           formData.dateOfBirth && formData.country && formData.state && 
+           formData.program && formData.employmentStatus && formData.yearsOfExperience &&
            validateEmail(formData.email) && validatePhone(formData.phoneNumber);
+  };
+
+  const getStatesForCountry = () => {
+    return countryStates[formData.country] || [];
   };
 
   return (
@@ -155,7 +207,7 @@ const PersonalInfo = () => {
       
       <div className="max-w-2xl mx-auto py-12 px-6">
         <h1 className="text-3xl font-bold text-gray-900 mb-8 text-center">
-          Step 1: Personal Information
+          Personal & Employment Information
         </h1>
         
         <div className="bg-white rounded-lg shadow-sm border p-8">
@@ -249,16 +301,32 @@ const PersonalInfo = () => {
             </div>
 
             <div>
-              <Label htmlFor="address">Address</Label>
-              <Textarea
-                id="address"
-                value={formData.address}
-                onChange={(e) => handleInputChange('address', e.target.value)}
-                className={cn("mt-1", validationErrors.address && "border-red-500")}
-                rows={3}
-              />
-              {validationErrors.address && (
-                <p className="text-red-500 text-sm mt-1">{validationErrors.address}</p>
+              <Label>State/Region</Label>
+              <Select 
+                value={formData.state} 
+                onValueChange={(value) => handleInputChange('state', value)}
+                disabled={!formData.country || formData.country === "Other"}
+              >
+                <SelectTrigger className={cn("mt-1", validationErrors.state && "border-red-500")}>
+                  <SelectValue placeholder={
+                    !formData.country || formData.country === "Other" 
+                      ? "Please select a country first" 
+                      : "-- Select State/Region --"
+                  } />
+                </SelectTrigger>
+                <SelectContent>
+                  {getStatesForCountry().map((state) => (
+                    <SelectItem key={state} value={state}>
+                      {state}
+                    </SelectItem>
+                  ))}
+                  {formData.country && formData.country !== "Other" && getStatesForCountry().length === 0 && (
+                    <SelectItem value="Not Listed">Not Listed</SelectItem>
+                  )}
+                </SelectContent>
+              </Select>
+              {validationErrors.state && (
+                <p className="text-red-500 text-sm mt-1">{validationErrors.state}</p>
               )}
             </div>
 
@@ -280,15 +348,66 @@ const PersonalInfo = () => {
                 <p className="text-red-500 text-sm mt-1">{validationErrors.program}</p>
               )}
             </div>
+
+            <div className="border-t pt-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Employment Information</h3>
+              
+              <div className="space-y-4">
+                <div>
+                  <Label>Employment Status</Label>
+                  <Select value={formData.employmentStatus} onValueChange={(value) => handleInputChange('employmentStatus', value)}>
+                    <SelectTrigger className={cn("mt-1", validationErrors.employmentStatus && "border-red-500")}>
+                      <SelectValue placeholder="-- Select Employment Status --" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {employmentStatuses.map((status) => (
+                        <SelectItem key={status} value={status}>
+                          {status}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {validationErrors.employmentStatus && (
+                    <p className="text-red-500 text-sm mt-1">{validationErrors.employmentStatus}</p>
+                  )}
+                </div>
+
+                <div>
+                  <Label htmlFor="yearsOfExperience">Years of Experience</Label>
+                  <Input
+                    id="yearsOfExperience"
+                    type="number"
+                    min="0"
+                    value={formData.yearsOfExperience}
+                    onChange={(e) => handleInputChange('yearsOfExperience', e.target.value)}
+                    className={cn("mt-1", validationErrors.yearsOfExperience && "border-red-500")}
+                  />
+                  {validationErrors.yearsOfExperience && (
+                    <p className="text-red-500 text-sm mt-1">{validationErrors.yearsOfExperience}</p>
+                  )}
+                </div>
+
+                <div>
+                  <Label htmlFor="currentEmployer">Current/Previous Employer (Optional)</Label>
+                  <Input
+                    id="currentEmployer"
+                    type="text"
+                    value={formData.currentEmployer}
+                    onChange={(e) => handleInputChange('currentEmployer', e.target.value)}
+                    className="mt-1"
+                  />
+                </div>
+              </div>
+            </div>
           </div>
 
           <div className="mt-8">
             <Button 
               onClick={handleNext}
               disabled={loading || !isFormValid()}
-              className="w-full bg-purple-600 hover:bg-purple-700 text-white py-3 shadow-lg hover:shadow-purple-500/25 transition-all duration-300"
+              className="w-full bg-green-600 hover:bg-green-700 text-white py-3 shadow-lg hover:shadow-green-500/25 transition-all duration-300"
             >
-              {loading ? "Loading..." : "Next: Employment Info"}
+              {loading ? "Loading..." : "Next: Review Application"}
             </Button>
           </div>
         </div>
