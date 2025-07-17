@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Navigation from "@/components/Navigation";
@@ -24,9 +23,7 @@ const PersonalInfo = () => {
     country: '',
     state: '',
     program: '',
-    employmentStatus: '',
-    yearsOfExperience: '',
-    currentEmployer: ''
+    employmentStatus: ''
   });
   const [countries, setCountries] = useState<Array<{id: number, name: string, code: string}>>([]);
   const [programs, setPrograms] = useState<Array<{id: number, name: string, description: string}>>([]);
@@ -152,7 +149,6 @@ const PersonalInfo = () => {
     if (!formData.state) errors.state = "State is required";
     if (!formData.program) errors.program = "Program is required";
     if (!formData.employmentStatus) errors.employmentStatus = "Employment status is required";
-    if (!formData.yearsOfExperience) errors.yearsOfExperience = "Years of experience is required";
     
     if (Object.keys(errors).length > 0) {
       setValidationErrors(errors);
@@ -164,7 +160,7 @@ const PersonalInfo = () => {
       return;
     }
 
-    // Store form data in localStorage with employment info included
+    // Store form data in localStorage
     const applicationData = {
       // Personal info
       fullName: formData.fullName,
@@ -175,17 +171,10 @@ const PersonalInfo = () => {
       address: formData.state, // Using state as address for compatibility
       program: formData.program,
       // Employment info
-      employmentStatus: formData.employmentStatus,
-      yearsOfExperience: formData.yearsOfExperience,
-      currentEmployer: formData.currentEmployer
+      employmentStatus: formData.employmentStatus
     };
     
     localStorage.setItem('personalInfo', JSON.stringify(applicationData));
-    localStorage.setItem('employmentInfo', JSON.stringify({
-      employmentStatus: formData.employmentStatus,
-      yearsOfExperience: formData.yearsOfExperience,
-      currentEmployer: formData.currentEmployer
-    }));
     
     navigate('/apply/review');
   };
@@ -193,7 +182,7 @@ const PersonalInfo = () => {
   const isFormValid = () => {
     return formData.fullName && formData.email && formData.phoneNumber && 
            formData.dateOfBirth && formData.country && formData.state && 
-           formData.program && formData.employmentStatus && formData.yearsOfExperience &&
+           formData.program && formData.employmentStatus &&
            validateEmail(formData.email) && validatePhone(formData.phoneNumber);
   };
 
@@ -352,51 +341,23 @@ const PersonalInfo = () => {
             <div className="border-t pt-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Employment Information</h3>
               
-              <div className="space-y-4">
-                <div>
-                  <Label>Employment Status</Label>
-                  <Select value={formData.employmentStatus} onValueChange={(value) => handleInputChange('employmentStatus', value)}>
-                    <SelectTrigger className={cn("mt-1", validationErrors.employmentStatus && "border-red-500")}>
-                      <SelectValue placeholder="-- Select Employment Status --" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {employmentStatuses.map((status) => (
-                        <SelectItem key={status} value={status}>
-                          {status}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  {validationErrors.employmentStatus && (
-                    <p className="text-red-500 text-sm mt-1">{validationErrors.employmentStatus}</p>
-                  )}
-                </div>
-
-                <div>
-                  <Label htmlFor="yearsOfExperience">Years of Experience</Label>
-                  <Input
-                    id="yearsOfExperience"
-                    type="number"
-                    min="0"
-                    value={formData.yearsOfExperience}
-                    onChange={(e) => handleInputChange('yearsOfExperience', e.target.value)}
-                    className={cn("mt-1", validationErrors.yearsOfExperience && "border-red-500")}
-                  />
-                  {validationErrors.yearsOfExperience && (
-                    <p className="text-red-500 text-sm mt-1">{validationErrors.yearsOfExperience}</p>
-                  )}
-                </div>
-
-                <div>
-                  <Label htmlFor="currentEmployer">Current/Previous Employer (Optional)</Label>
-                  <Input
-                    id="currentEmployer"
-                    type="text"
-                    value={formData.currentEmployer}
-                    onChange={(e) => handleInputChange('currentEmployer', e.target.value)}
-                    className="mt-1"
-                  />
-                </div>
+              <div>
+                <Label>Employment Status</Label>
+                <Select value={formData.employmentStatus} onValueChange={(value) => handleInputChange('employmentStatus', value)}>
+                  <SelectTrigger className={cn("mt-1", validationErrors.employmentStatus && "border-red-500")}>
+                    <SelectValue placeholder="-- Select Employment Status --" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {employmentStatuses.map((status) => (
+                      <SelectItem key={status} value={status}>
+                        {status}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {validationErrors.employmentStatus && (
+                  <p className="text-red-500 text-sm mt-1">{validationErrors.employmentStatus}</p>
+                )}
               </div>
             </div>
           </div>
@@ -405,7 +366,7 @@ const PersonalInfo = () => {
             <Button 
               onClick={handleNext}
               disabled={loading || !isFormValid()}
-              className="w-full bg-green-600 hover:bg-green-700 text-white py-3 shadow-lg hover:shadow-green-500/25 transition-all duration-300"
+              className="w-full h-14 text-lg bg-green-600 hover:bg-green-700 text-white py-4 shadow-lg hover:shadow-xl hover:shadow-green-500/30 transition-all duration-300 transform hover:scale-105 font-semibold rounded-lg"
             >
               {loading ? "Loading..." : "Next: Review Application"}
             </Button>

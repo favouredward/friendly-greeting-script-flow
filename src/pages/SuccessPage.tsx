@@ -77,7 +77,7 @@ const SuccessPage = () => {
             </div>
             
             <div className="flex">
-              <span className="font-semibold text-gray-900 w-40">Address:</span>
+              <span className="font-semibold text-gray-900 w-40">State/Region:</span>
               <span className="text-gray-700">{applicationData.address}</span>
             </div>
             
@@ -90,25 +90,6 @@ const SuccessPage = () => {
               <span className="font-semibold text-gray-900 w-40">Employment Status:</span>
               <span className="text-gray-700">{applicationData.employmentStatus}</span>
             </div>
-            
-            <div className="flex">
-              <span className="font-semibold text-gray-900 w-40">Years of Experience:</span>
-              <span className="text-gray-700">{applicationData.yearsOfExperience}</span>
-            </div>
-            
-            {applicationData.currentEmployer && (
-              <div className="flex">
-                <span className="font-semibold text-gray-900 w-40">Current Employer:</span>
-                <span className="text-gray-700">{applicationData.currentEmployer}</span>
-              </div>
-            )}
-            
-            {applicationData.salary && (
-              <div className="flex">
-                <span className="font-semibold text-gray-900 w-40">Salary:</span>
-                <span className="text-gray-700">{applicationData.salary}</span>
-              </div>
-            )}
           </div>
           
           <div className="mt-8 text-center">

@@ -19,7 +19,6 @@ export type Database = {
           address: string
           country: string
           created_at: string | null
-          current_employer: string | null
           date_of_birth: string
           email: string
           employment_status: string
@@ -31,13 +30,11 @@ export type Database = {
           salary: string | null
           status: string | null
           updated_at: string | null
-          years_of_experience: number
         }
         Insert: {
           address: string
           country: string
           created_at?: string | null
-          current_employer?: string | null
           date_of_birth: string
           email: string
           employment_status: string
@@ -49,13 +46,11 @@ export type Database = {
           salary?: string | null
           status?: string | null
           updated_at?: string | null
-          years_of_experience?: number
         }
         Update: {
           address?: string
           country?: string
           created_at?: string | null
-          current_employer?: string | null
           date_of_birth?: string
           email?: string
           employment_status?: string
@@ -67,7 +62,6 @@ export type Database = {
           salary?: string | null
           status?: string | null
           updated_at?: string | null
-          years_of_experience?: number
         }
         Relationships: []
       }

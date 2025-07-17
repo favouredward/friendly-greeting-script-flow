@@ -42,8 +42,6 @@ const ReviewApplication = () => {
         address: personalInfo.address, // This now contains the state
         program: personalInfo.program,
         employment_status: personalInfo.employmentStatus,
-        years_of_experience: parseInt(personalInfo.yearsOfExperience) || 0,
-        current_employer: personalInfo.currentEmployer || null,
         status: 'submitted'
       };
 
@@ -177,16 +175,6 @@ const ReviewApplication = () => {
                 <label className="font-medium text-gray-700">Employment Status:</label>
                 <p className="text-gray-900">{personalInfo.employmentStatus}</p>
               </div>
-              <div>
-                <label className="font-medium text-gray-700">Years of Experience:</label>
-                <p className="text-gray-900">{personalInfo.yearsOfExperience}</p>
-              </div>
-              {personalInfo.currentEmployer && (
-                <div>
-                  <label className="font-medium text-gray-700">Current/Previous Employer:</label>
-                  <p className="text-gray-900">{personalInfo.currentEmployer}</p>
-                </div>
-              )}
             </CardContent>
           </Card>
         </div>
@@ -203,7 +191,7 @@ const ReviewApplication = () => {
           <Button 
             onClick={handleSubmit}
             disabled={loading}
-            className="flex-1 bg-green-600 hover:bg-green-700 text-white shadow-lg hover:shadow-green-500/25 transition-all duration-300"
+            className="flex-1 h-14 text-lg bg-green-600 hover:bg-green-700 text-white shadow-lg hover:shadow-xl hover:shadow-green-500/30 transition-all duration-300 transform hover:scale-105 font-semibold"
           >
             {loading ? "Submitting..." : "Submit Application"}
           </Button>
