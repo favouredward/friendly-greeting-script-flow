@@ -38,10 +38,12 @@ const ReviewApplication = () => {
         email: personalInfo.email,
         phone_number: personalInfo.phoneNumber,
         date_of_birth: personalInfo.dateOfBirth,
+        gender: personalInfo.gender,
         country: personalInfo.country,
         address: personalInfo.address, // This now contains the state
         program: personalInfo.program,
         employment_status: personalInfo.employmentStatus,
+        reason_for_joining: personalInfo.reasonForJoining,
         status: 'submitted'
       };
 
@@ -125,11 +127,11 @@ const ReviewApplication = () => {
           Review Your Application
         </h1>
         
-        <div className="grid md:grid-cols-2 gap-6 mb-8">
-          {/* Personal Information Card */}
+        <div className="mb-8">
+          {/* Single Application Information Card */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-purple-600">Personal Information</CardTitle>
+              <CardTitle className="text-purple-600">Application Information</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
@@ -151,6 +153,10 @@ const ReviewApplication = () => {
                 </p>
               </div>
               <div>
+                <label className="font-medium text-gray-700">Gender:</label>
+                <p className="text-gray-900">{personalInfo.gender}</p>
+              </div>
+              <div>
                 <label className="font-medium text-gray-700">Country:</label>
                 <p className="text-gray-900">{personalInfo.country}</p>
               </div>
@@ -162,18 +168,13 @@ const ReviewApplication = () => {
                 <label className="font-medium text-gray-700">Program:</label>
                 <p className="text-gray-900">{personalInfo.program}</p>
               </div>
-            </CardContent>
-          </Card>
-
-          {/* Employment Information Card */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-purple-600">Employment Information</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
               <div>
                 <label className="font-medium text-gray-700">Employment Status:</label>
                 <p className="text-gray-900">{personalInfo.employmentStatus}</p>
+              </div>
+              <div>
+                <label className="font-medium text-gray-700">Reason for Joining:</label>
+                <p className="text-gray-900 whitespace-pre-wrap">{personalInfo.reasonForJoining}</p>
               </div>
             </CardContent>
           </Card>
@@ -186,12 +187,12 @@ const ReviewApplication = () => {
             className="flex-1"
             disabled={loading}
           >
-            Back to Personal Info
+            Back to Application Form
           </Button>
           <Button 
             onClick={handleSubmit}
             disabled={loading}
-            className="flex-1 h-14 text-lg bg-green-600 hover:bg-green-700 text-white shadow-lg hover:shadow-xl hover:shadow-green-500/30 transition-all duration-300 transform hover:scale-105 font-semibold"
+            className="flex-1 h-14 text-lg"
           >
             {loading ? "Submitting..." : "Submit Application"}
           </Button>

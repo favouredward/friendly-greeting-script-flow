@@ -23,10 +23,12 @@ export type Database = {
           email: string
           employment_status: string
           full_name: string
+          gender: string | null
           id: string
           notes: string | null
           phone_number: string
           program: string
+          reason_for_joining: string | null
           salary: string | null
           status: string | null
           updated_at: string | null
@@ -39,10 +41,12 @@ export type Database = {
           email: string
           employment_status: string
           full_name: string
+          gender?: string | null
           id?: string
           notes?: string | null
           phone_number: string
           program: string
+          reason_for_joining?: string | null
           salary?: string | null
           status?: string | null
           updated_at?: string | null
@@ -55,10 +59,12 @@ export type Database = {
           email?: string
           employment_status?: string
           full_name?: string
+          gender?: string | null
           id?: string
           notes?: string | null
           phone_number?: string
           program?: string
+          reason_for_joining?: string | null
           salary?: string | null
           status?: string | null
           updated_at?: string | null

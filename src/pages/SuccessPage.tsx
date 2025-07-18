@@ -72,6 +72,11 @@ const SuccessPage = () => {
             </div>
             
             <div className="flex">
+              <span className="font-semibold text-gray-900 w-40">Gender:</span>
+              <span className="text-gray-700">{applicationData.gender}</span>
+            </div>
+            
+            <div className="flex">
               <span className="font-semibold text-gray-900 w-40">Country:</span>
               <span className="text-gray-700">{applicationData.country}</span>
             </div>
@@ -90,11 +95,16 @@ const SuccessPage = () => {
               <span className="font-semibold text-gray-900 w-40">Employment Status:</span>
               <span className="text-gray-700">{applicationData.employmentStatus}</span>
             </div>
+            
+            <div className="flex flex-col">
+              <span className="font-semibold text-gray-900 mb-2">Reason for Joining:</span>
+              <span className="text-gray-700 whitespace-pre-wrap bg-gray-50 p-3 rounded">{applicationData.reasonForJoining}</span>
+            </div>
           </div>
           
           <div className="mt-8 text-center">
             <Link to="/">
-              <Button className="bg-green-600 hover:bg-green-700 text-white px-8">
+              <Button>
                 Return to Home
               </Button>
             </Link>

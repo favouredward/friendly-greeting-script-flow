@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Navigation from "@/components/Navigation";
@@ -20,10 +21,12 @@ const PersonalInfo = () => {
     email: '',
     phoneNumber: '',
     dateOfBirth: null as Date | null,
+    gender: '',
     country: '',
     state: '',
     program: '',
-    employmentStatus: ''
+    employmentStatus: '',
+    reasonForJoining: ''
   });
   const [countries, setCountries] = useState<Array<{id: number, name: string, code: string}>>([]);
   const [programs, setPrograms] = useState<Array<{id: number, name: string, description: string}>>([]);
@@ -53,6 +56,10 @@ const PersonalInfo = () => {
 
   const employmentStatuses = [
     "Employed", "Unemployed", "Self-employed", "Student", "Freelancer"
+  ];
+
+  const genderOptions = [
+    "Male", "Female", "Other", "Prefer not to say"
   ];
 
   useEffect(() => {
@@ -145,10 +152,12 @@ const PersonalInfo = () => {
     // Check other required fields
     if (!formData.fullName) errors.fullName = "Full name is required";
     if (!formData.dateOfBirth) errors.dateOfBirth = "Date of birth is required";
+    if (!formData.gender) errors.gender = "Gender is required";
     if (!formData.country) errors.country = "Country is required";
     if (!formData.state) errors.state = "State is required";
     if (!formData.program) errors.program = "Program is required";
     if (!formData.employmentStatus) errors.employmentStatus = "Employment status is required";
+    if (!formData.reasonForJoining) errors.reasonForJoining = "Reason for joining is required";
     
     if (Object.keys(errors).length > 0) {
       setValidationErrors(errors);
@@ -167,11 +176,13 @@ const PersonalInfo = () => {
       email: formData.email,
       phoneNumber: formData.phoneNumber,
       dateOfBirth: formData.dateOfBirth,
+      gender: formData.gender,
       country: formData.country,
       address: formData.state, // Using state as address for compatibility
       program: formData.program,
       // Employment info
-      employmentStatus: formData.employmentStatus
+      employmentStatus: formData.employmentStatus,
+      reasonForJoining: formData.reasonForJoining
     };
     
     localStorage.setItem('personalInfo', JSON.stringify(applicationData));
@@ -181,8 +192,8 @@ const PersonalInfo = () => {
 
   const isFormValid = () => {
     return formData.fullName && formData.email && formData.phoneNumber && 
-           formData.dateOfBirth && formData.country && formData.state && 
-           formData.program && formData.employmentStatus &&
+           formData.dateOfBirth && formData.gender && formData.country && formData.state && 
+           formData.program && formData.employmentStatus && formData.reasonForJoining &&
            validateEmail(formData.email) && validatePhone(formData.phoneNumber);
   };
 
@@ -196,7 +207,7 @@ const PersonalInfo = () => {
       
       <div className="max-w-2xl mx-auto py-12 px-6">
         <h1 className="text-3xl font-bold text-gray-900 mb-8 text-center">
-          Personal & Employment Information
+          Application Information
         </h1>
         
         <div className="bg-white rounded-lg shadow-sm border p-8">
@@ -270,6 +281,25 @@ const PersonalInfo = () => {
             </div>
 
             <div>
+              <Label>Gender</Label>
+              <Select value={formData.gender} onValueChange={(value) => handleInputChange('gender', value)}>
+                <SelectTrigger className={cn("mt-1", validationErrors.gender && "border-red-500")}>
+                  <SelectValue placeholder="-- Select Gender --" />
+                </SelectTrigger>
+                <SelectContent>
+                  {genderOptions.map((gender) => (
+                    <SelectItem key={gender} value={gender}>
+                      {gender}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {validationErrors.gender && (
+                <p className="text-red-500 text-sm mt-1">{validationErrors.gender}</p>
+              )}
+            </div>
+
+            <div>
               <Label>Country</Label>
               <Select value={formData.country} onValueChange={(value) => handleInputChange('country', value)}>
                 <SelectTrigger className={cn("mt-1", validationErrors.country && "border-red-500")}>
@@ -338,27 +368,37 @@ const PersonalInfo = () => {
               )}
             </div>
 
-            <div className="border-t pt-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Employment Information</h3>
-              
-              <div>
-                <Label>Employment Status</Label>
-                <Select value={formData.employmentStatus} onValueChange={(value) => handleInputChange('employmentStatus', value)}>
-                  <SelectTrigger className={cn("mt-1", validationErrors.employmentStatus && "border-red-500")}>
-                    <SelectValue placeholder="-- Select Employment Status --" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {employmentStatuses.map((status) => (
-                      <SelectItem key={status} value={status}>
-                        {status}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {validationErrors.employmentStatus && (
-                  <p className="text-red-500 text-sm mt-1">{validationErrors.employmentStatus}</p>
-                )}
-              </div>
+            <div>
+              <Label>Employment Status</Label>
+              <Select value={formData.employmentStatus} onValueChange={(value) => handleInputChange('employmentStatus', value)}>
+                <SelectTrigger className={cn("mt-1", validationErrors.employmentStatus && "border-red-500")}>
+                  <SelectValue placeholder="-- Select Employment Status --" />
+                </SelectTrigger>
+                <SelectContent>
+                  {employmentStatuses.map((status) => (
+                    <SelectItem key={status} value={status}>
+                      {status}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {validationErrors.employmentStatus && (
+                <p className="text-red-500 text-sm mt-1">{validationErrors.employmentStatus}</p>
+              )}
+            </div>
+
+            <div>
+              <Label htmlFor="reasonForJoining">Reason for Joining</Label>
+              <Textarea
+                id="reasonForJoining"
+                placeholder="Please tell us why you want to join this program and what you hope to achieve..."
+                value={formData.reasonForJoining}
+                onChange={(e) => handleInputChange('reasonForJoining', e.target.value)}
+                className={cn("mt-1 min-h-[120px]", validationErrors.reasonForJoining && "border-red-500")}
+              />
+              {validationErrors.reasonForJoining && (
+                <p className="text-red-500 text-sm mt-1">{validationErrors.reasonForJoining}</p>
+              )}
             </div>
           </div>
 
@@ -366,9 +406,9 @@ const PersonalInfo = () => {
             <Button 
               onClick={handleNext}
               disabled={loading || !isFormValid()}
-              className="w-full h-14 text-lg bg-green-600 hover:bg-green-700 text-white py-4 shadow-lg hover:shadow-xl hover:shadow-green-500/30 transition-all duration-300 transform hover:scale-105 font-semibold rounded-lg"
+              className="w-full h-16 text-xl bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white py-4 shadow-lg hover:shadow-2xl hover:shadow-green-500/40 transition-all duration-300 transform hover:scale-105 font-bold rounded-lg border-0"
             >
-              {loading ? "Loading..." : "Next: Review Application"}
+              {loading ? "Loading..." : "Apply Now →"}
             </Button>
           </div>
         </div>
