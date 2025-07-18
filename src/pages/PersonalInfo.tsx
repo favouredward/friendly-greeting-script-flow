@@ -406,7 +406,7 @@ const PersonalInfo = () => {
             <Button 
               onClick={handleNext}
               disabled={loading || !isFormValid()}
-              className="w-full h-16 text-xl bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white py-4 shadow-lg hover:shadow-2xl hover:shadow-green-500/40 transition-all duration-300 transform hover:scale-105 font-bold rounded-lg border-0"
+              className="w-full"
             >
               {loading ? "Loading..." : "Apply Now →"}
             </Button>
