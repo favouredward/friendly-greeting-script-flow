@@ -29,6 +29,12 @@ serve(async (req) => {
       );
     }
 
+    // Configuration - Update these as needed
+    const COMPANY_NAME = "Your Company Name"; // Update this
+    const FROM_EMAIL = "payments@yourcompany.com"; // Update this to your verified domain
+    const SUPPORT_EMAIL = "support@yourcompany.com"; // Update this
+    const COMPANY_WEBSITE = "https://yourcompany.com"; // Update this
+
     // Prepare email content
     const emailHtml = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -70,15 +76,18 @@ serve(async (req) => {
             </ul>
           </div>
           
-          <p>If you have any questions about your payment or need assistance, please don't hesitate to contact our support team.</p>
+          <p>If you have any questions about your payment or need assistance, please don't hesitate to contact our support team at <a href="mailto:${SUPPORT_EMAIL}" style="color: #10b981;">${SUPPORT_EMAIL}</a>.</p>
           
           <div style="text-align: center; margin-top: 30px;">
-            <p style="color: #666;">Thank you for choosing our program!</p>
+            <p style="color: #666;">Thank you for choosing ${COMPANY_NAME}!</p>
+            <p style="color: #666; font-size: 12px;">
+              Visit us at <a href="${COMPANY_WEBSITE}" style="color: #10b981;">${COMPANY_WEBSITE}</a>
+            </p>
           </div>
         </div>
         
         <div style="background-color: #374151; color: white; padding: 20px; text-align: center;">
-          <p style="margin: 0;">© 2024 Payment Portal. All rights reserved.</p>
+          <p style="margin: 0;">© 2024 ${COMPANY_NAME}. All rights reserved.</p>
         </div>
       </div>
     `;
@@ -91,7 +100,7 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from: 'payments@yourcompany.com',
+        from: FROM_EMAIL,
         to: [applicantEmail],
         subject: `Payment Confirmation - ₦${amount.toLocaleString()} Received`,
         html: emailHtml,

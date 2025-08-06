@@ -1,10 +1,29 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowLeft, CreditCard, Shield, Clock } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+
+// Extend Window interface to include PaystackPop
+declare global {
+  interface Window {
+    PaystackPop: {
+      setup: (config: {
+        key: string;
+        email: string;
+        amount: number;
+        currency: string;
+        ref: string;
+        metadata: any;
+        callback: (response: any) => void;
+        onClose: () => void;
+      }) => {
+        openIframe: () => void;
+      };
+    };
+  }
+}
 
 const PaymentProcessing = () => {
   const [paymentData, setPaymentData] = useState<any>(null);

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -29,12 +28,16 @@ const PaymentDashboard = () => {
 
   const loadPaymentHistory = async (email: string) => {
     try {
-      // Set the email context for RLS policy
-      await supabase.rpc('set_config', {
-        setting_name: 'app.current_user_email',
-        setting_value: email,
-        is_local: true
-      });
+      // Set the email context for RLS policy - handle potential errors
+      try {
+        await supabase.rpc('set_config', {
+          setting_name: 'app.current_user_email',
+          setting_value: email,
+          is_local: true
+        });
+      } catch (configError) {
+        console.log('Config setting not available, continuing without it:', configError);
+      }
 
       // Fetch payments for this application
       const { data: paymentData, error } = await supabase

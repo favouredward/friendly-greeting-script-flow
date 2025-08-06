@@ -4,9 +4,9 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Mail, ArrowRight, ExternalLink } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Mail, ArrowRight, ExternalLink } from "lucide-react";
 
 const PaymentEmailVerification = () => {
   const [email, setEmail] = useState("");
@@ -14,13 +14,17 @@ const PaymentEmailVerification = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const handleVerifyEmail = async (e: React.FormEvent) => {
+  // Configuration - Update these URLs as needed
+  const MAIN_APPLICATION_URL = "https://yourapp.com"; // Update this to your main application URL
+  const SUPPORT_EMAIL = "support@yourcompany.com"; // Update this to your support email
+
+  const handleEmailVerification = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!email) {
+    if (!email.trim()) {
       toast({
         title: "Email Required",
-        description: "Please enter your email address.",
+        description: "Please enter your email address to continue.",
         variant: "destructive"
       });
       return;
@@ -29,42 +33,47 @@ const PaymentEmailVerification = () => {
     setLoading(true);
 
     try {
-      // Check if email exists in applications table
-      const { data, error } = await supabase
-        .from('applications')
-        .select('*')
-        .eq('email', email)
-        .single();
+      console.log('Verifying email:', email);
+      
+      // Call the verify-applicant edge function
+      const { data, error } = await supabase.functions.invoke('verify-applicant', {
+        body: { email: email.trim().toLowerCase() }
+      });
 
-      if (error && error.code !== 'PGRST116') {
-        throw error;
-      }
+      console.log('Verification response:', data, error);
 
-      if (!data) {
-        // Email doesn't exist, redirect to application website
+      if (error) {
+        console.error('Error verifying email:', error);
         toast({
-          title: "Application Not Found",
-          description: "Please complete your application first before making payment.",
+          title: "Verification Error",
+          description: "Unable to verify your email. Please try again or contact support.",
           variant: "destructive"
         });
-        
-        // Redirect to main application website after 3 seconds
-        setTimeout(() => {
-          window.location.href = "https://your-main-app-url.com"; // Update with actual URL
-        }, 3000);
-        
         return;
       }
 
-      // Email exists, store application data and navigate to details
-      localStorage.setItem('paymentApplicationData', JSON.stringify(data));
-      navigate('/verify-application');
+      if (data?.exists && data?.applicationData) {
+        // Email exists, store application data and proceed
+        localStorage.setItem('paymentApplicationData', JSON.stringify(data.applicationData));
+        toast({
+          title: "Email Verified!",
+          description: "Your application has been found. Proceeding to payment options.",
+        });
+        navigate('/verify-application');
+      } else {
+        // Email doesn't exist, show redirect option
+        toast({
+          title: "Application Not Found",
+          description: "No application found with this email. Please complete your application first.",
+          variant: "destructive"
+        });
+      }
 
     } catch (error: any) {
-      console.error('Error verifying email:', error);
+      console.error('Unexpected error:', error);
       toast({
-        title: "Verification Failed",
-        description: "An error occurred while verifying your email. Please try again.",
+        title: "System Error",
+        description: "An unexpected error occurred. Please try again later.",
         variant: "destructive"
       });
     } finally {
@@ -72,68 +81,104 @@ const PaymentEmailVerification = () => {
     }
   };
 
+  const handleRedirectToApplication = () => {
+    // Redirect to main application website
+    window.open(MAIN_APPLICATION_URL, '_blank');
+  };
+
   return (
-    <div className="min-h-screen flex items-center justify-center p-6">
+    <div className="min-h-screen flex items-center justify-center p-6 bg-gradient-to-br from-green-50 to-blue-50">
       <div className="w-full max-w-md space-y-6">
-        <div className="text-center">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Mail className="w-8 h-8 text-green-600" />
+          </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Payment Portal</h1>
           <p className="text-gray-600">Enter your email to access payment options</p>
         </div>
 
+        {/* Email Verification Form */}
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Mail className="w-5 h-5 text-green-600" />
-              Email Verification
-            </CardTitle>
+            <CardTitle className="text-center">Verify Your Email</CardTitle>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleVerifyEmail} className="space-y-4">
+            <form onSubmit={handleEmailVerification} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
                   Email Address
                 </label>
                 <Input
+                  id="email"
                   type="email"
+                  placeholder="Enter your email address"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Enter your registered email"
-                  required
+                  disabled={loading}
                   className="w-full"
                 />
               </div>
-
+              
               <Button 
                 type="submit" 
+                className="w-full" 
                 disabled={loading}
-                className="w-full"
+                size="lg"
               >
                 {loading ? (
-                  "Verifying..."
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    Verifying...
+                  </>
                 ) : (
                   <>
-                    Verify & Continue
+                    Verify Email
                     <ArrowRight className="w-4 h-4 ml-2" />
                   </>
                 )}
               </Button>
             </form>
-
-            <div className="mt-6 pt-4 border-t border-gray-200">
-              <p className="text-sm text-gray-600 text-center mb-3">
-                Haven't applied yet?
-              </p>
-              <Button 
-                variant="outline" 
-                className="w-full"
-                onClick={() => window.open("https://your-main-app-url.com", "_blank")}
-              >
-                <ExternalLink className="w-4 h-4 mr-2" />
-                Go to Application Website
-              </Button>
-            </div>
           </CardContent>
         </Card>
+
+        {/* Application Not Found Help */}
+        <Card className="bg-yellow-50 border-yellow-200">
+          <CardContent className="p-4">
+            <h3 className="font-medium text-yellow-800 mb-2">Don't have an application yet?</h3>
+            <p className="text-sm text-yellow-700 mb-3">
+              If you haven't submitted your application, please complete it first before making any payments.
+            </p>
+            <Button 
+              variant="outline" 
+              onClick={handleRedirectToApplication}
+              className="w-full bg-white hover:bg-yellow-50"
+            >
+              <ExternalLink className="w-4 h-4 mr-2" />
+              Go to Application Portal
+            </Button>
+          </CardContent>
+        </Card>
+
+        {/* Support Information */}
+        <div className="text-center text-sm text-gray-600">
+          <p>
+            Need help? Contact us at{' '}
+            <a 
+              href={`mailto:${SUPPORT_EMAIL}`} 
+              className="text-green-600 hover:underline"
+            >
+              {SUPPORT_EMAIL}
+            </a>
+          </p>
+        </div>
+
+        {/* Security Notice */}
+        <div className="text-center">
+          <p className="text-xs text-gray-500">
+            🔒 Your payment information is secured with 256-bit SSL encryption
+          </p>
+        </div>
       </div>
     </div>
   );
