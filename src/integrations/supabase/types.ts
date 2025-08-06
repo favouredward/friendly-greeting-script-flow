@@ -25,12 +25,15 @@ export type Database = {
           full_name: string
           gender: string | null
           id: string
+          months_paid: number | null
           notes: string | null
+          payment_status: string | null
           phone_number: string
           program: string
           reason_for_joining: string | null
           salary: string | null
           status: string | null
+          total_amount_paid: number | null
           updated_at: string | null
         }
         Insert: {
@@ -43,12 +46,15 @@ export type Database = {
           full_name: string
           gender?: string | null
           id?: string
+          months_paid?: number | null
           notes?: string | null
+          payment_status?: string | null
           phone_number: string
           program: string
           reason_for_joining?: string | null
           salary?: string | null
           status?: string | null
+          total_amount_paid?: number | null
           updated_at?: string | null
         }
         Update: {
@@ -61,12 +67,15 @@ export type Database = {
           full_name?: string
           gender?: string | null
           id?: string
+          months_paid?: number | null
           notes?: string | null
+          payment_status?: string | null
           phone_number?: string
           program?: string
           reason_for_joining?: string | null
           salary?: string | null
           status?: string | null
+          total_amount_paid?: number | null
           updated_at?: string | null
         }
         Relationships: []
@@ -88,6 +97,91 @@ export type Database = {
           name?: string
         }
         Relationships: []
+      }
+      payment_plans: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: number
+          is_active: boolean | null
+          monthly_amount: number
+          program_id: number | null
+          total_duration_months: number
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: number
+          is_active?: boolean | null
+          monthly_amount?: number
+          program_id?: number | null
+          total_duration_months?: number
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: number
+          is_active?: boolean | null
+          monthly_amount?: number
+          program_id?: number | null
+          total_duration_months?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_plans_program_id_fkey"
+            columns: ["program_id"]
+            isOneToOne: false
+            referencedRelation: "programs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      payments: {
+        Row: {
+          amount_paid: number
+          application_id: string
+          created_at: string | null
+          id: string
+          months_paid_for: number
+          payment_date: string | null
+          payment_reference: string
+          payment_status: string | null
+          paystack_reference: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          amount_paid: number
+          application_id: string
+          created_at?: string | null
+          id?: string
+          months_paid_for: number
+          payment_date?: string | null
+          payment_reference: string
+          payment_status?: string | null
+          paystack_reference?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          amount_paid?: number
+          application_id?: string
+          created_at?: string | null
+          id?: string
+          months_paid_for?: number
+          payment_date?: string | null
+          payment_reference?: string
+          payment_status?: string | null
+          paystack_reference?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payments_application_id_fkey"
+            columns: ["application_id"]
+            isOneToOne: false
+            referencedRelation: "applications"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       programs: {
         Row: {

@@ -10,6 +10,7 @@ import ReviewApplication from "./pages/ReviewApplication";
 import SuccessPage from "./pages/SuccessPage";
 import NotFound from "./pages/NotFound";
 import Footer from "./components/Footer";
+import PaymentApp from "./payment-app";
 
 const queryClient = new QueryClient();
 
@@ -26,6 +27,7 @@ const App = () => (
               <Route path="/apply/personal" element={<PersonalInfo />} />
               <Route path="/apply/review" element={<ReviewApplication />} />
               <Route path="/apply/success" element={<SuccessPage />} />
+              <Route path="/payment/*" element={<PaymentApp />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </div>
