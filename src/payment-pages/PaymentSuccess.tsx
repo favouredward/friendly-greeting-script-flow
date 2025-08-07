@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -16,7 +15,7 @@ const PaymentSuccess = () => {
   useEffect(() => {
     const storedData = localStorage.getItem('paymentSuccessData');
     if (!storedData) {
-      navigate('/');
+      navigate('/payment/');
       return;
     }
     
@@ -207,12 +206,12 @@ const PaymentSuccess = () => {
             Download Receipt
           </Button>
           
-          <Button onClick={() => navigate('/dashboard')} variant="outline" className="flex-1">
+          <Button onClick={() => navigate('/payment/dashboard')} variant="outline" className="flex-1">
             <Eye className="w-4 h-4 mr-2" />
             View Dashboard
           </Button>
           
-          <Button onClick={() => navigate('/')} className="flex-1">
+          <Button onClick={() => navigate('/payment/')} className="flex-1">
             <Home className="w-4 h-4 mr-2" />
             Back to Home
           </Button>
@@ -223,8 +222,8 @@ const PaymentSuccess = () => {
           <CardContent className="p-4 text-center">
             <p className="text-sm text-gray-600">
               Need help? Contact our support team at{' '}
-              <a href="mailto:support@yourcompany.com" className="text-green-600 hover:underline">
-                support@yourcompany.com
+              <a href="mailto:support@yourdomain.com" className="text-green-600 hover:underline">
+                support@yourdomain.com
               </a>
             </p>
           </CardContent>

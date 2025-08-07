@@ -15,8 +15,8 @@ const PaymentEmailVerification = () => {
   const { toast } = useToast();
 
   // Configuration - Update these URLs as needed
-  const MAIN_APPLICATION_URL = "https://yourapp.com"; // Update this to your main application URL
-  const SUPPORT_EMAIL = "support@yourcompany.com"; // Update this to your support email
+  const MAIN_APPLICATION_URL = "https://your-main-application.com"; // Update this to your main application URL
+  const SUPPORT_EMAIL = "support@yourdomain.com"; // Update this to your support email
 
   const handleEmailVerification = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -59,7 +59,7 @@ const PaymentEmailVerification = () => {
           title: "Email Verified!",
           description: "Your application has been found. Proceeding to payment options.",
         });
-        navigate('/verify-application');
+        navigate('/payment/verify-application');
       } else {
         // Email doesn't exist, show redirect option
         toast({

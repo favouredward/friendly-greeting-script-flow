@@ -34,14 +34,14 @@ const PaymentProcessing = () => {
   useEffect(() => {
     const storedData = localStorage.getItem('paymentData');
     if (!storedData) {
-      navigate('/');
+      navigate('/payment/');
       return;
     }
     setPaymentData(JSON.parse(storedData));
   }, [navigate]);
 
   const handleBack = () => {
-    navigate('/payment-options');
+    navigate('/payment/payment-options');
   };
 
   const initiatePaystackPayment = async () => {
@@ -85,7 +85,7 @@ const PaymentProcessing = () => {
             description: "Your payment has been processed successfully.",
           });
           
-          navigate('/payment-success');
+          navigate('/payment/payment-success');
         },
         onClose: function() {
           // Payment was closed without completion

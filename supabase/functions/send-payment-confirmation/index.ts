@@ -30,10 +30,10 @@ serve(async (req) => {
     }
 
     // Configuration - Update these as needed
-    const COMPANY_NAME = "Your Company Name"; // Update this
-    const FROM_EMAIL = "payments@yourcompany.com"; // Update this to your verified domain
-    const SUPPORT_EMAIL = "support@yourcompany.com"; // Update this
-    const COMPANY_WEBSITE = "https://yourcompany.com"; // Update this
+    const COMPANY_NAME = "Learning Management Academy"; // Updated company name
+    const FROM_EMAIL = "payments@yourdomain.com"; // Update this to your verified domain
+    const SUPPORT_EMAIL = "support@yourdomain.com"; // Updated support email
+    const COMPANY_WEBSITE = "https://your-main-application.com"; // Updated website URL
 
     // Prepare email content
     const emailHtml = `

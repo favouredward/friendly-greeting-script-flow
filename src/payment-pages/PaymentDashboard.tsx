@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -27,7 +26,7 @@ const PaymentDashboard = () => {
   useEffect(() => {
     const storedData = localStorage.getItem('paymentApplicationData');
     if (!storedData) {
-      navigate('/');
+      navigate('/payment/');
       return;
     }
     
@@ -93,11 +92,11 @@ const PaymentDashboard = () => {
   };
 
   const handleBack = () => {
-    navigate('/verify-application');
+    navigate('/payment/verify-application');
   };
 
   const handleMakePayment = () => {
-    navigate('/payment-options');
+    navigate('/payment/payment-options');
   };
 
   const getPaymentStatusColor = (status: string) => {

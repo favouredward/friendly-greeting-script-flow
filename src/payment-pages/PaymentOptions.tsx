@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -14,14 +13,14 @@ const PaymentOptions = () => {
   useEffect(() => {
     const storedData = localStorage.getItem('paymentApplicationData');
     if (!storedData) {
-      navigate('/');
+      navigate('/payment/');
       return;
     }
     setApplicationData(JSON.parse(storedData));
   }, [navigate]);
 
   const handleBack = () => {
-    navigate('/verify-application');
+    navigate('/payment/verify-application');
   };
 
   const handleProceedToPayment = () => {
@@ -34,7 +33,7 @@ const PaymentOptions = () => {
     };
     
     localStorage.setItem('paymentData', JSON.stringify(paymentData));
-    navigate('/payment');
+    navigate('/payment/payment');
   };
 
   if (!applicationData) {
@@ -82,7 +81,7 @@ const PaymentOptions = () => {
             <p className="text-gray-600 mb-4">
               You have already completed all payments for your program.
             </p>
-            <Button onClick={() => navigate('/dashboard')}>
+            <Button onClick={() => navigate('/payment/dashboard')}>
               View Payment History
             </Button>
           </CardContent>

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -13,18 +12,18 @@ const ApplicationDetails = () => {
   useEffect(() => {
     const storedData = localStorage.getItem('paymentApplicationData');
     if (!storedData) {
-      navigate('/');
+      navigate('/payment/');
       return;
     }
     setApplicationData(JSON.parse(storedData));
   }, [navigate]);
 
   const handleProceedToPayment = () => {
-    navigate('/payment-options');
+    navigate('/payment/payment-options');
   };
 
   const handleBack = () => {
-    navigate('/');
+    navigate('/payment/');
   };
 
   if (!applicationData) {
@@ -185,7 +184,7 @@ const ApplicationDetails = () => {
           
           <Button 
             variant="outline" 
-            onClick={() => navigate('/dashboard')}
+            onClick={() => navigate('/payment/dashboard')}
             size="lg"
           >
             View Payment History
