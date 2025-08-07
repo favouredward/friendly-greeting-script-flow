@@ -31,9 +31,9 @@ const PaymentDashboard = () => {
       return;
     }
     
-    const appData = JSON.parse(storedData);
+    const appData = JSON.parse(storedData) as ApplicationData;
     setApplicationData(appData);
-    if (appData.email) {
+    if (appData.email && appData.id) {
       loadPaymentHistory(appData.email, appData.id);
     }
   }, [navigate]);
