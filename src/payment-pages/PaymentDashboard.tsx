@@ -38,7 +38,7 @@ const PaymentDashboard = () => {
     }
   }, [navigate]);
 
-  const loadPaymentHistory = async (email: string, applicationId: string) => {
+  const loadPaymentHistory = async (email: string, applicationId: string): Promise<void> => {
     try {
       // Set the email context for RLS policy - handle potential errors
       try {
