@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -7,8 +8,17 @@ import { supabase } from "@/integrations/supabase/client";
 import { ArrowLeft, CreditCard, Calendar, Download, Eye, Plus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
+interface ApplicationData {
+  id: string;
+  email: string;
+  full_name: string;
+  payment_status: string;
+  months_paid: number;
+  total_amount_paid: number;
+}
+
 const PaymentDashboard = () => {
-  const [applicationData, setApplicationData] = useState<any>(null);
+  const [applicationData, setApplicationData] = useState<ApplicationData | null>(null);
   const [payments, setPayments] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
@@ -24,11 +34,11 @@ const PaymentDashboard = () => {
     const appData = JSON.parse(storedData);
     setApplicationData(appData);
     if (appData.email) {
-      loadPaymentHistory(appData.email);
+      loadPaymentHistory(appData.email, appData.id);
     }
   }, [navigate]);
 
-  const loadPaymentHistory = async (email: string) => {
+  const loadPaymentHistory = async (email: string, applicationId: string) => {
     try {
       // Set the email context for RLS policy - handle potential errors
       try {
@@ -45,7 +55,7 @@ const PaymentDashboard = () => {
       const { data: paymentData, error } = await supabase
         .from('payments')
         .select('*')
-        .eq('application_id', applicationData?.id)
+        .eq('application_id', applicationId)
         .order('payment_date', { ascending: false });
 
       if (error && error.code !== 'PGRST116') {
