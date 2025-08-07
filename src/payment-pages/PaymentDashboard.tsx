@@ -23,7 +23,9 @@ const PaymentDashboard = () => {
     
     const appData = JSON.parse(storedData);
     setApplicationData(appData);
-    loadPaymentHistory(appData.email);
+    if (appData.email) {
+      loadPaymentHistory(appData.email);
+    }
   }, [navigate]);
 
   const loadPaymentHistory = async (email: string) => {
